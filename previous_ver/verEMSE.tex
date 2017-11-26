@@ -1,0 +1,1192 @@
+\documentclass{svjour3}
+\usepackage{times}
+\usepackage{blindtext, graphicx}
+\usepackage{subfigure} 
+\usepackage{colortbl}
+\usepackage{tikz}
+\usepackage{microtype}
+\def\firstcircle{(90:1.75cm) circle (2.5cm)}
+\def\secondcircle{(210:1.75cm) circle (2.5cm)}
+\def\thirdcircle{(330:1.75cm) circle (2.5cm)}
+\smartqed
+
+\usepackage{balance}
+\definecolor{Gray}{rgb}{0.88,1,1}
+\definecolor{Gray}{gray}{0.85}
+\definecolor{lightgray}{gray}{0.8}
+
+
+\usepackage[framed]{ntheorem}
+\usepackage{framed}
+\usepackage{tikz}
+\usetikzlibrary{shadows}
+\theoremclass{Lesson}
+\theoremstyle{break}
+
+% inner sep=10pt,
+\tikzstyle{thmbox} = [rectangle, rounded corners, draw=black,
+fill=Gray!20,  drop shadow={fill=black, opacity=1}]
+\newcommand\thmbox[1]{%
+    \noindent\begin{tikzpicture}%w
+    \node [thmbox] (box){%
+        \begin{minipage}{.94\textwidth}%
+        \vspace{-3mm}#1\vspace{-3mm}%
+        \end{minipage}%
+    };%
+    \end{tikzpicture}}
+
+\let\theoremframecommand\thmbox
+\newshadedtheorem{lesson}{Finding}
+\newcommand{\quart}[4]{\begin{picture}(80,4)%1
+    {\color{black}\put(#3,2){\circle*{4}}\put(#1,2){\line(1,0){#2}}}\end{picture}}
+
+%% space saving measures
+% \usepackage[shortlabels]{enumitem}  
+% \usepackage{url}
+
+\begin{document}
+
+\title{How to Read Less: On the Benefit of Human-in-the-loop Incremental Learning for Systematic Literature Review%\thanks{Grants or other notes
+%about the article that should go on the front page should be
+%placed here. General acknowledgments should be placed at the end of the article.}
+}
+% \subtitle{Do you have a subtitle?\\ If so, write it here}
+
+
+% \pagenumbering{arabic} %XXX delete before submission
+
+\author{Zhe Yu         \and
+        Nicholas A. Kraft \and 
+        Tim Menzies%etc.
+}
+
+%\authorrunning{Short form of author list} % if too long for running head
+
+\institute{Zhe Yu \at
+              Department of Computer Science, North Carolina State University, Raleigh, NC, USA \\
+              \email{zyu9@ncsu.edu}           %  \\
+%             \emph{Present address:} of F. Author  %  if needed
+           \and
+           Nicholas A. Kraft \at
+              ABB Corporate Research, Raleigh, NC, USA\\
+              \email{nicholas.a.kraft@us.abb.com}
+            \and
+           Tim Menzies \at
+              Department of Computer Science, North Carolina State University, Raleigh, NC, USA \\
+              \email{tim.menzies@gmail.com}
+}
+
+% \date{Received: date / Accepted: date}
+
+\maketitle
+
+\begin{abstract}
+  
+Systematic literature reviews (SLRs) are the primary method for aggregating and synthesizing evidence in evidence-based software engineering (SE). Primary study selection is a critical and time-consuming SLR step in which reviewers use
+titles, abstracts, or even full texts to evaluate thousands of studies to find the dozens of them that are relevant to the research questions. We seek to reduce the effort of primary study selection in SE SLRs by exploring and refactoring the state-of-the-art human-in-the-loop incremental learning techniques from evidence-based medicine and legal electronic discovery. By refactoring those methods, we discovered FASTREAD, which is a new state-of-the-art in human-in-the-loop incremental learning for SE SLRs. Tested on two data sets generated from existing SE SLRs of Hall, Wahono, et al., FASTREAD outperforms the current state-of-the-art methods. Our results suggest that FASTREAD is able to find $90\%$ of the studies found by standard manual methods, by only reading less than $10\%$ of the candidate studies.
+
+\keywords{Active Learning\and Human-in-the-loop Incremental Learning\and Systematic Literature Review\and Software Engineering\and Primary Study Selection}
+
+\end{abstract}
+
+
+
+\section{Introduction}
+\label{sect: Introduction}
+
+The number of new publications every year is growing rapidly. For example, on defect
+prediction, 729 studies were published on IEEE
+Xplore\footnote{http://ieeexplore.ieee.org} during the year of 2005 while 1,564
+studies were published during the year of 2015.
+Given this increasingly faster pace of software engineering (SE) research,
+it has become harder and harder to remain current with
+the state-of-the-art research in software engineering.
+
+
+\begin{figure*}[t]
+    \centering
+    \subfigure[Most Difficult Aspects of SLR Process.]
+    {
+        \includegraphics[width=0.48\linewidth]{difficult.png}
+        \label{fig: difficult}
+    }
+    \subfigure[Most Time Consuming Aspects of SLR Process.]
+    {
+        \includegraphics[width=0.48\linewidth]{time.png}
+        \label{fig: time}
+    }    
+    \caption{Data collected from surveys to SLR authors~\cite{carver2013identifying}. Measured by number of votes, where blue, red, and green are number of times voted as most, second most, and third most, respectively.}
+    \label{fig:barrier}
+\end{figure*}
+Systematic Literature Reviews
+(SLRs) are one approach to this problem. SLRs are a well established and widely
+applied review method in Software Engineering since Kitchenham, Dyb{\^{a}}, and
+J{\o}rgensen first adopted it to support evidence-based software engineering in
+2004 and 2005~\cite{kitchenham2004evidence,1377125}. 
+Researchers can get a
+general idea of current activity in their field of interests by reading the SLR
+studies. Furthermore, a
+deeper understanding of the topic may be gained by conducting an SLR.
+
+An increasing number of SLRs has been conducted since the proposal and
+revision of the SLR guidelines by Kitchenham in 2007~\cite{keele2007guidelines}. For
+example, there are 26 SLRs on IEEE Xplore during the year of 2005 and the
+number has increased to 137 for the year of 2010 and 199 for the year of
+2015. Various scholars  suggest that an SLR is required before any research in Software
+Engineering is conducted~\cite{keele2007guidelines}.
+While this is certainly a good advice,
+currently an SLR is
+a large, time consuming and complex
+task~\cite{hassler2016identification,hassler2014outcomes,carver2013identifying,bowes2012slurp}.
+
+Cost reduction in SLRs is therefore an interesting topic and will benefit researchers in software engineering community.
+Previously we have analyzed the costs of SLRs~\cite{hassler2014outcomes,carver2013identifying}. As shown in Fig.~\ref{fig:barrier}, primary study selection, which is noted as ``selecting papers'' in Fig.~\ref{fig:barrier}, is among the top three most difficult
+as well as time-consuming aspects in an SLR. Usually, reviewers need to evaluate
+thousands of studies trying to find dozens of them that are relevant to the
+research questions based on their title, abstract, or full text~\cite{bowes2012slurp}. An extreme
+example of this is where reviewers sourced over
+3,000 studies, and only used 7 of them in their final review~\cite{bezerra2009systematic}. The cost associated with primary study selection has become a serious problem and will continue to grow in the near future as the population of candidates for primary
+studies increases dramatically. In this paper, we focus on reducing cost in primary study selection only. We prioritize primary study selection because there exists tool support for other time-consuming aspects such as searching databases~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using}, extracting data\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp}, assessing quality~\cite{fernandez2010slr,bowes2012slurp,Molleri:2015:SWA:2745802.2745825}; and machine learning methods are promising in cost reduction for primary study selection~\cite{wallace2010semi,grossman2013}.
+
+
+
+There are three main aspects in primary study selection: \textbf{(1)} retrieving initial list of primary studies, \textbf{(2)} excluding irrelevant studies, \textbf{(3)} including missing studies. We focus on excluding irrelevant studies because \textbf{a)} there already exists techniques and tools to facilitate \textbf{(1)} and \textbf{(3)} such as Snowballing~\cite{jalali2012systematic} and StArt~\cite{hernandes2012using}; \textbf{b)} the performance of excluding irrelevant studies can be evaluated using existing SLR publications.
+
+In the SE research community, linear manual review is still the standard approach for primary study selection~\cite{kitchenham2013systematic}. On the other hand, machine learning algorithms have been intensively studied to solve similar problems in other fields outside the SE research community in evidence-based medicine~\cite{wallace2010semi,wallace2010active} and in
+legal electronic discovery~\cite{cormack2014evaluation,cormack2015autonomy}. This paper:
+\begin{itemize}
+\item
+Reviews those methods. We find that in evidence-based medicine and legal electronic discovery, there are two widely recognized state-of-the-art methods~\cite{cormack2014evaluation,wallace2010semi}.
+\item
+Those three methods are assembled from four lower-level techniques, each with two major choices.
+That is, we can refactor the state-of-the-art in evidence-based medicine and legal electronic discovery 16 different ways.
+\item
+Of those 16, there are only 12 valid combinations. This paper explores all 12 combinations using data taken from the SE literature.
+\item
+We find that one of those combinations, which we will call FASTREAD, significantly outperforms the rest.
+\end{itemize}
+Interestingly, the FASTREAD combination is not one of those used
+in~\cite{cormack2014evaluation,wallace2010semi}-- which is to say that the SE literature has nuanced differences to other kinds of literature and we should not just blindly
+apply methods from other fields without certifying them on local data.
+Using FASTREAD, 90\% of the ``relevant'' studies can be retrieved by reviewing only 10\% of the candidate studies. That is, FASTREAD can dramatically reduce the cost of primary study selection in SE SLRs.
+   
+
+To assess those refactored methods,
+we need some ``gold sets'',
+on which we can compare different combinations. Fortunately, in the arena of software
+engineering, there exist very prominent ``gold sets'' as published SLRs. This paper explores two such SLRs: Wahono et al. 2015~\cite{wahono2015systematic} and Hall et
+al. 2012~\cite{hall2012systematic}.  We chose these since they seem to be the
+state-of-the-art in this arena. One is very recent (2015), the other is highly
+cited (305 citations), and both define their work in enough details for us to construct data sets for simulations. 
+More details about the ``gold
+sets'' will be presented later in Section~\ref{sect: Data Sets}. Using
+these ``gold sets'', we ask and answer the following three research questions:
+
+\begin{itemize}
+
+
+\item
+{\bf RQ1: Can human-in-the-loop incremental learning techniques reduce cost in primary study selection?} First of all, the effectiveness of human-in-the-loop incremental learning should be tested against traditional linear review. The rest of the research questions should not be investigated until human-in-the-loop incremental learning has been proved to be useful for cost reduction in primary study selection.
+
+\item
+{\bf RQ2: Should we just adopt the state-of-the-art methods from other fields? Is it possible to build a better one by mixing and matching from those?} Human-in-the-loop incremental learning methods have been explored in other fields. Each of the state-of-the-art methods has its own advantage and thereby a better method might be derived by mixing and matching from those. 
+
+\item
+{\bf RQ3: How much effort can FASTREAD, our new state-of-the-art method for primary study selection, save in an SLR?} Details should be provided so that reviewers can decide whether to use FASTREAD or not.
+
+
+\end{itemize}
+The main contributions of this paper are:
+\begin{itemize}
+\item
+  A demonstration of the value of  machine learning techniques for assisting primary study selection in SE SLRs.
+\item
+  The development of FASTREAD, a new state-of-the-art human-in-the-loop method for primary study selection in SE SLRs, by refactoring two state-of-the-art methods
+  from evidence-based medicine and electronic discovery.
+  
+\item
+  The evaluation of our new method.
+  The experiments shown below indicate that FASTREAD
+  saves 90\% review efforts on primary study selection.
+\item The development of a simple tool to implement FASTREAD for primary study selection.
+  This tool is explained in Section~\ref{sect: tool} and is
+  available for download on GitHub\footnote{https://github.com/fastread/src}. 
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\section{Frequently Asked Questions}
+\label{sect: Frequently Asked Questions}
+
+When we discuss FASTREAD with our colleagues, several issues are commonly raised. This section discusses these issues.
+
+\subsection{What about the other costs associated with SLRs?}
+
+Our focus on the cost reductions of primary study selection is not to discount the effort associated with other parts of the SLR process. As mentioned in our introduction, we focus here on primary study selection since our data (from Fig.~\ref{fig:barrier}) indicates that this is a major component of SLR cost. 
+
+In addition, there are tools support other components of SLRs and techniques facilitating primary study selection in different approaches. All these techniques (such as  Quasi-Gold Standard based search, visual text mining, and snowballing) are compatible and a better performance is expected when applied together. This leads to a direction of future work in which the best setting to integrate different techniques will be explored.
+
+\subsection{What is missed?}
+
+Our results will show, FASTREAD can reach $90\%$ recall with $10\%$ of the cost of a linear review. Given that, it is wise to reflect
+on the 10\% of papers {\em not} found by such an analysis. To this end, we took one of our case studies and reflected on:
+\begin{itemize}
+\item The set of papers $P_0$ that a human analysts declared to be ``relevant'' (as listed in their reference list at the end of their paper);
+\item The {\em tangentially relevant} subset of those  papers $P_1 \subseteq P_0$ that a human analysts explicitly mentions, however briefly, in the body of their paper;
+\item The yet smaller subset of those papers $P_2 \subseteq P_1$  that a human analyst discusses, at length, in the body of their report (and for
+our purposes ``at length'' will be ``more that two lines''). We call these these {\em insightful papers}. Clearly, FASTREAD should not be recommended if our method always misses the insightful papers, 
+\end{itemize}
+For the case studies shown below, on 30 repeats of our method the $|P_2|=0$; i.e. FASTREAD never missed an insightful paper. As for the tangentially
+relevant papers, FASTREAD found all of those in 90\% of the 30 repeats. 
+
+Based on this analysis, we infer that missing  $10\%$ of the papers is not a major impediment to using FASTREAD. That said,  it is still true that if the SLR conductor does not want to miss any potential relevant study, he or she need to review all the candidate studies with full cost. We are actively exploring possibilities to mitigate or compensate the missing studies issue. 
+
+% Data imbalance is explored further in Fioravanti and Nesi
+% [[43]] and Zhang et al..
+
+% Nikora and Munson [[126]] says that “without a widely agreed definition of severity
+% we cannot reason about it” and Ostrand et al.
+ 
+
+\subsection{What about domain knowledge?}
+
+In our simulations, we assume that the learner can access no external knowledge for building up initial seed training set. This assumption represents the worst case while no external knowledge is available. We show in this work that the absence of that domain knowledge is not a critical failing of the approach. On the other hand, such domain knowledge usually exists in real world SLRs and will boost the performance of FASTREAD if wisely used. For example, if one relevant example and one irrelevant example are known in the very beginning, the random sampling step of FASTREAD is no longer needed and thus leads to additional cost reduction. More details about how to wisely use domain knowledge to boost FASTREAD will be explored further after this work. While we have some preliminary results in that area, we have nothing definitive to report at this time.
+
+\subsection{What about real human reviewers?}
+
+In our simulations, we assume that there is only one reviewer who never make mistakes. In real world SLRs, there will be multiple reviewers who make some mistakes. 
+
+First, consider we have multiple reviewers but no mistakes. The schema of FASTREAD can be changed to one central learner with multiple review agents. Every agent reviews different studies and feedback his or her decisions to the central learner. The central learner then trains on the feedback of every agent and assigns studies to each agent for review. Such schema will keep all the property of single reviewer FASTREAD and performs similarly. In addition, there might be more intelligent way to allocate review tasks based on the different performance of review agents. Such possibility is worth exploring in future works and there already exists some studies on this topic in evidence-based medicine~\cite{wallace2011should}.
+
+Second, consider those multiple reviewers now make mistakes. Candidate studies need to be reviewed by multiple reviewers in case any of them makes mistakes. To explore this issue, appropriate data need to be collected on how human reviewers make mistakes. Wallace et al. addressed this issue in~\cite{nguyen2015combining} by analysing the best policy for allocating review tasks to reviewers with different experience levels as well as difference costs. We also plan to to address this issue in our future works.
+
+
+\subsection{What about multiple categories of studies?}
+
+In our simulations, we assume that the target is binary classification. However, primary study selection in real world SLRs might be a multi-label classification problem. For example, an SLR with three research questions might go through a primary study selection while each candidate is labeled as ``relevant to RQ1'', ``relevant to RQ2'', or ``irrelevant'' while the first two labels can co-exist. The simplest solution for this is to run multiple FASTREAD learners each learns on one label vs. others and each reviewer classify on one label only. In this case, the multi-label classification problem can be divided into multiple FASTREAD problems. Additional work such as ensemble learners can be explored in future works.
+
+In summary, FASTREAD is an in-development technique that can be applied if the above trade-offs are acceptable. It can still be improved to further reduce cost of primary study selection and we will keep working on the issues until it becomes a reliable tool for different scenarios of SLRs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Large Scale Literature Studies in SE}
+\label{sect: Background}
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{.48\linewidth}
+    \includegraphics[width=\linewidth]{procedure.pdf}
+    \caption{Systematic literature review steps suggested by~\cite{keele2007guidelines}. In this work, we focus on Step 6: primary study selection.}
+    \label{fig: slr}
+    \end{minipage}
+    \begin{minipage}[t]{.48\linewidth}
+    \includegraphics[width=\linewidth]{primary_study_selection.pdf}
+    \caption{Primary study selection steps suggested by~\cite{keele2007guidelines}. In this work, we focus on the excluding irrelevant studies part.}
+    \label{fig: prime}
+    \end{minipage}
+\end{figure}
+
+
+
+% In contrast to a primary study, which investigates a specific research question,
+% a systematic literature review is a form of secondary study aimed at
+% identifying, evaluating and interpreting all available research relevant to a
+% particular research question, topic area, or phenomenon of
+% interest~\cite{keele2007guidelines}.
+In the modern academic world, it is
+impossible to start a research without first knowing what other researchers have
+done in the topic area. Conducting an SLR is one way to gain
+background knowledge on a certain topic area.
+If that SLR is published, then that paper becomes a useful research tool
+for other researchers.  Kitchenham recommend SLRs to be standard
+procedure in SE research~\cite{kitchenham2004evidence,keele2007guidelines}.
+
+An SLR is usually conducted following the procedures in Fig.~\ref{fig: slr}. There can be variances on the real
+implementations~\cite{wahono2015systematic,malhotra2015systematic,radjenovic2013software,unterkalmsteiner2012evaluation,hall2012systematic},
+but all are based on the same guideline~\cite{keele2007guidelines}. In this
+study, we focus on Step 6: primary study selection because \textbf{a)} it is among the most time consuming and difficult steps of an SLR~\cite{carver2013identifying}; \textbf{b)} there are existing tools support other time consuming steps such as searching databases~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using}, extracting data\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp}, assessing quality~\cite{fernandez2010slr,bowes2012slurp,Molleri:2015:SWA:2745802.2745825}; \textbf{c)} and machine learning methods are promising in cost reduction for primary study selection~\cite{wallace2010semi,grossman2013}.
+
+ 
+% \label{subsect: Primary Study Selection}
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=0.6\linewidth]{primary_study_selection.pdf}
+%     \caption{Primary study selection steps suggested by~\cite{keele2007guidelines}. In this work, we focus on the excluding irrelevant studies part.}
+%     \label{fig: prime}
+% \end{figure}
+
+
+An important early step in SLR is primary study selection. This starts with an initial candidate collection of studies retrieved by searching. In the first round of that process,
+the reviewers' job is to read the titles and abstracts of candidate studies and classify each as ``relevant'' or ``irrelevant''. After the first round of review, the reviewers read through the full text of the previously included studies and make further decision on whether it is actually ``relevant'' or not. The whole procedure is shown in Fig.~\ref{fig: prime}. In this study, we focus on how to utilize machine learning algorithms to speed up the ``Exclude Irrelevant Studies'' step.
+
+Typically, reviewers need to identify a final list of dozens of primary studies
+among the initial collection of thousands of candidates. In terms of actual
+cost, Malheiros has documented in~\cite{malheiros2007visual} that it requires 3
+hours for one reviewer to review 100 studies.  This implies that it is a month's
+work for one graduate student to review 3000 studies or three month's work to
+review 9000 studies. Also, in our previous studies, primary
+study selection has been identified as one of the top three most time-consuming
+and difficult step in SLR~\cite{carver2013identifying}, as well as one of the
+top desired features to be automated by tools and has not yet been
+supported~\cite{hassler2014outcomes,hassler2016identification,marshall2015tools,marshall2014tools}.
+
+
+In this work, we try to reduce the cost of the primary study selection by applying machine learning techniques to assist excluding irrelevant studies since \textbf{a)} there already exists techniques and tools to facilitate retrieving initial list and including missing studies such as Snowballing~\cite{jalali2012systematic} and StArt~\cite{hernandes2012using}; \textbf{b)} the performance of excluding irrelevant studies can be evaluated using existing SLR publications. In our {\em human-in-the-tloop} approach, each time a human reviews a paper, a learner updates its knowledge about what kind of documents are relevant. After that, the human uses that learned knowledge to guide her selection of the next paper to read.
+
+
+
+\subsection{Semi-Automated Tools for Literature  Reviews}
+
+\subsubsection{Software Engineering Tools}
+
+In recent years, various tools have been developed to facilitate SLRs in software engineering community, as summarized in~\cite{marshall2015tools,marshall2014tools,marshall2013tools}. These tools aim at providing support for protocol development~\cite{Molleri:2015:SWA:2745802.2745825,fernandez2010slr,hernandes2012using}, automated search~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using}, primary study selection~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp}, quality assessment~\cite{fernandez2010slr,bowes2012slurp,Molleri:2015:SWA:2745802.2745825}, data extraction and validation~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp}, data synthesis~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp},
+and report write up~\cite{Molleri:2015:SWA:2745802.2745825,hernandes2012using,fernandez2010slr,bowes2012slurp}. It is extremely helpful to have a tool for managing the whole SLR process. However, the support for primary study selection using these tools is limited (e.g., to tasks such as assigning review jobs to multiple reviewers or to resolving disagreements).
+Hence, we assert that the current SE SLR literature provides
+no tool that can offer reductions in the effort required for primary study selection comparable to those reductions offered by human-in-the-loop incremental learning. 
+
+Visual text mining (VTM) is a technique especially explored in Software Engineering community to support SLR. It is an unsupervised learning method which visualizes the relationship between candidate studies and helps the reviewer to make quick decisions. Malheiros et al.~\cite{malheiros2007visual} first applied VTM to support primary study selection in SLR. In their small-scale experiment (100 candidate studies, 31 of which are ``relevant''), VTM retrieves around 90\% of the ``relevant'' studies by spending about 30\% as much time as manual review. However, VTM requires some prior experience and knowledge of text mining and visualization techniques to use~\cite{bowes2012slurp}, and more case studies with large scale are needed to validate their results. 
+
+
+Snowballing is another technique attracting much attention in SE SLR research. Given the inherent relevance relationship between a study and its citations, it is of high probability for the citations of (used in backward snowballing) and the studies cite (used in forward snowballing) a known ``relevant'' study to also be ``relevant''~\cite{kitchenham2004evidence}. Jalali and Wohlin~\cite{jalali2012systematic,wohlin2014guidelines} applied backward snowballing to search for primary studies in SE SLRs and found comparably good result as database search. Felizardo et al.~\cite{felizardo2016using} and Wohlin~\cite{wohlin2016second} applied forward snowballing to update SE SLRs and greatly reduced the number studies need to be reviewed comparing to a database search. This paper does not use snowballing since, as mentioned by Wohlin~\cite{wohlin2014guidelines}, snowballing starts with an initial set of relevant papers.
+FASTREAD's task is very different: we start with zero relevant papers.
+
+
+
+\subsubsection{Evidence-based Medicine Tools}
+\label{sect: Evidence-based Medicine}
+
+Systematic literature reviews were first adopted from evidence-based medicine in
+2004~\cite{kitchenham2004evidence}. To facilitate citation screening (primary
+study selection) in systematic review, Wallace conducted a series of studies
+with machine learning techniques, especially active
+learning~\cite{wallace2010semi,wallace2010active,wallace2011should,wallace2012deploying,wallace2013active,wallace2013modernizing,nguyen2015combining}. Wallace
+first set up a baseline approach called ``patient active learning'' (PAL), which will be explained later in this subsection, for machine learning assisted citation
+screening~\cite{wallace2010semi}. The performance of patient active learning
+is good enough (nearly 100\% of the ``relevant''
+citations can be retrieved at half of the conventional review cost) to convince
+systematic review conductors to adopt machine learning assisted citation
+screening. Instead of improving this baseline method, Wallace then focused on other aspects of machine learning assisted citation screening such as introducing external expert knowledge~\cite{wallace2010active}, allocating review tasks to multiple experts~\cite{wallace2011should} or to crowd sourcing workers~\cite{nguyen2015combining}, and building a tool called abstrackr to provide overall support~\cite{wallace2012deploying}. 
+
+Wallace's work on this topic is of  
+exemplary high-impact and
+ his core algorithm   (on simple expert screening),   is   the most
+popular human-in-the-loop incremental learning technique we have found in the
+evidence-based medical literature. That said,
+this technique has not been updated   since 2010~\cite{wallace2010semi}.
+
+In this paper we are focused on cost minimization. Hence, we do not explore
+techniques such as Wallace's use of multiple experts (but in future work,
+we will explore this approach).
+
+Other work related to machine learning assisted citation screening do not
+utilize active learning and human-in-the-loop incremental learning. Pure supervised learning
+requires a sufficiently large training set, which leads to a huge review
+cost~\cite{cohen2006reducing,adeva2014automatic}. Therefore the patient active
+learning proposed by Wallace et al. is still the state-of-the-art method for
+citation screening in the scenario with no external knowledge and equally
+expensive reviewers. Details on patient active learning will be provided in Section~\ref{sect: Patient Active Learning}.
+
+
+
+\subsubsection{Legal Electronic Discovery Tools}
+\label{sect: Electronic Discovery}
+
+Electronic Discovery (e-discovery) is a part of civil litigation where one party (the producing party), offers up materials which are pertinent to a legal case~\cite{krishna2016bigse}. This involves a review task where the producing party need to retrieve every ``relevant'' document in their possession and turn them over to the requesting party. It is extremely important to reduce the review cost in e-discovery since in a common case, the producing party will need to retrieve thousands of ``relevant'' documents among millions of candidates. Technology-assisted review (TAR) is the technique to facilitate the review process. The objective of TAR is to find as many
+of the ``relevant'' documents in a collection as possible, with reasonable cost~\cite{grossman2013}. Various machine learning algorithms have been studied in TAR. So far, in every controlled studies, continuous active learning has outperformed others~\cite{cormack2014evaluation,cormack2015autonomy}, which makes it the state-of-the-art method in legal electronic discovery. Details on continuous active learning will be provided in Section~\ref{sect: Continuous Active Learning}.
+
+% Interestingly, the relationship between e-discovery and evidence-based medicine have been discussed in~\cite{leasesystematic} but their methods are still diverged. Relying on Grossman and Cormack~\cite{grossman2013} for support, many legal service providers have adopted TAR to facilitate the review process.
+
+% In summary: the state-of-the-art human-in-the-loop incremental learning techniques are patient active learning in evidence-based medicine and continuous active learning in e-discovery.
+
+
+\section{Technical Briefing}
+\label{sect: Technical Briefing}
+
+\begin{figure}[!t]
+    \centering
+    \subfigure[Training SVM without data balancing]
+    {
+        \includegraphics[width=0.46\linewidth]{train.png}
+        \label{fig:train}
+    }
+    \subfigure[Training SVM with aggressive undersampling]
+    {
+        \includegraphics[width=0.46\linewidth]{train_a.png}
+        \label{fig:train_a}
+    }
+    \quad
+    \subfigure[Predictions with model in (a)]
+    {
+        \includegraphics[width=0.46\linewidth]{test.png}
+        \label{fig:test}
+    }
+    \subfigure[Predictions with model in (b)]
+    {
+        \includegraphics[width=0.46\linewidth]{test_a.png}
+        \label{fig:test_a}
+    }
+    
+    \caption{(a) and (b) shows how SVM model is trained on imbalanced data, where ``$+$'' is the minority class, ``relevant'' studies in SLR, ``$X$'' is the majority class, ``irrelevant'' studies in SLR, and black line is SVM decision plane. In (b), aggressive undersampling balances the training data by throwing away majority class examples closest to the old decision plane in (a). (c) and (d) show how SVM suggests the next batch of studies to be reviewed. In uncertainty sampling, Group A will be suggested since it is believed that the examples closest to the decision plane are most informative and once labeled, can help in training SVM most~\cite{settles2012active}. In certainty sampling, Group B will be suggested since they are of highest prediction probability of belonging to the relevant class ``$+$''.}
+    \label{fig:SVM}
+\end{figure}
+
+In this section, we provide details on technical terms 
+used in the paper,  along with some brief introductory
+notes on machine learning techniques used in human-in-the-loop incremental learning.
+
+\subsection{Support Vector Machine}
+\label{sect: Support Vector Machine}
+
+Support vector machine (SVM) is a well-known and widely used classification method. The idea behind is to map input data to a high-dimension feature space and then construct a linear decision plane in that feature space~\cite{cortes1995support}. Linear SVM~\cite{joachims2006training} has been proved to be a useful model in SE text mining~\cite{krishna2016bigse} and is applied in the state-of-the-art human-in-the-loop incremental learning methods of both evidence-based medicine and electronic discovery~\cite{wallace2010semi,cormack2014evaluation}. Fig.~\ref{fig:SVM} illustrates linear SVM model on a two-dimension feature space.
+
+\subsection{Active Learning}
+\label{sect: Active learning}
+
+Active learning is a cost-aware machine learning algorithm where labels of training data can be acquired with certain costs. The key idea behind active learning is that a machine learning algorithm can perform better with less
+training if it is allowed to choose the data from which it learns~\cite{settles2012active}. There are several scenarios active learning is applied to, such as membership query synthesis, stream-based selective sampling, and pool-based sampling~\cite{settles2010active}. There are also different query strategies of active learning, such as uncertainty sampling, query-by-committee, expected model change, expected error reduction, variance reduction, and density-weighted methods~\cite{settles2010active}. Here, we will briefly introduce one scenario and two query strategies, which will be used in our later experiments and discussions.
+
+\textbf{Pool-based sampling} is the scenario of primary study selection. This scenario starts with a fixed size pool of unlabeled data. Labels for the data can be acquired by querying an oracle selectively. The goal of pool-based sampling is to select the most informative data in the pool for query, thereby building a better model with less training.
+
+\textbf{Uncertainty sampling} is the query strategy utilized in the state-of-the-art human-in-the-loop incremental learning technique of evidence-based medicine~\cite{wallace2010semi,wallace2010active}. It is also recognized as the most simple and commonly used query strategy~\cite{settles2010active}. In this query strategy, uncertainty sampling queries the instances about which the learner is least certain how to label. These instances are those (a) whose posterior probability of being positive are nearest 0.5 in probabilistic models or (b) closest to the decision boundary in models such as SVM. A demonstration of certainty sampling with SVM model can be found in Fig.~\ref{fig:SVM}.
+
+\textbf{Certainty sampling} is another query strategy which is applied in the state-of-the-art human-in-the-loop incremental learning technique of electronic discovery~\cite{cormack2014evaluation,cormack2015autonomy}. In contrast to uncertainty sampling, certainty sampling queries the instances about which the learner is most certain to label as positive. These instances are those (a) whose posterior probability of being positive are highest in probabilistic models, or (b) lies in the positive side of the decision boundary and furthest to the decision boundary in models such as SVM. A demonstration of certainty sampling with SVM model can be found in Fig.~\ref{fig:SVM}. This query strategy is usually NOT used when building the classifier of active learning since it is commonly believed that examples queried by certainty sampling contains less information than those by uncertainty sampling.
+
+
+\subsection{Patient Active Learning}
+\label{sect: Patient Active Learning}
+
+The state-of-the-art human-in-the-loop incremental learning method in evidence-based medicine, patient active learning can be described as following~\cite{wallace2010semi}:
+
+\begin{itemize}
+
+\item
+{\bf Stage I: Construct an initial seed training set} by random sampling from the candidate study pool and asking a human reviewer to label the papers in the set as ``relevant'' or ``irrelevant''. Stop and proceed to Stage II when \textit{enough} ``relevant'' studies have been retrieved to represent the ``relevant'' class. (Note that Wallace et al.~\cite{wallace2010semi} do not provide an explicit definition of \textit{``enough''}.)
+
+\item
+{\bf Stage II: Build the classifier}, which is a linear SVM, by repeatedly training on labeled studies and uncertainty sampling. Unlabeled studies in the pool will be ranked in the descending order of uncertainty (uncertainty sampling). The human reviewer labels the studies in the ranked order and feeds them back to retrain the classifier. Stop and proceed to Stage III when the classifier is \textit{stable}. (Note that Wallace et al.~\cite{wallace2010semi} do not provide an explicit definition of \textit{``stable''}.)
+
+\item
+{\bf Stage III: Prediction.} Retrain the classifier with aggressive undersampling and then stop training. Unlabeled studies in the pool will be ranked in the descending order of the classifier's prediction probability of being ``relevant'' (certainty sampling as discussed in Section~\ref{sect: Active learning}). The human reviewer labels the studies in the ranked order until finished (running out of review cost budget, enough ``relevant'' studies found, or no more ``relevant'' studies are detected in multiple rounds).
+
+\end{itemize}
+
+{\bf Aggressive undersampling: }The data for citation screening are (at times, extremely) imbalanced, i.e., the prevalence of ``relevant'' citations is always smaller than $50\%$ (and often much smaller). Classification algorithms are typically optimized for overall accuracy, rather than accuracy, precision, recall to a particular class. This becomes a problem when only the performance on a minority class matters. Patient active learning utilizes aggressive undersampling for data balancing. By throwing away majority (``irrelevant'') class training examples which are closest to the SVM decision hyperplane, it undersamples the majority class training examples to the same size as minority (``relevant'') class. It is a recall friendly undersampling method since the new decision hyperplane is pushed away from the minority class. An exampling of aggressive undersampling is shown in Fig.~\ref{fig:SVM}.
+
+\subsection{Continuous Active Learning}
+\label{sect: Continuous Active Learning}
+
+The state-of-the-art human-in-the-loop incremental learning method in e-discovery, continuous active learning can be described as following~\cite{cormack2014evaluation,cormack2015autonomy,tredennick2015}:
+
+\begin{itemize}
+
+\item
+{\bf Stage I: Construct an initial seed training set} by random sampling from the candidate study pool and ask a human reviewer for labels. Stop and proceed to Stage II as soon as \textbf{ONE} ``relevant'' study is retrieved.
+
+\item
+{\bf Stage II: Predict and retrain} by repeatedly training on labeled studies and certainty sampling. Unlabeled studies in the pool will be ranked in the descending order of the classifier's prediction probability of being ``relevant'' (certainty sampling). A human reviewer labels the studies in the ranked order and feeds them back to retrain the classifier until finished.
+
+\end{itemize}
+
+In contrast to patient active learning, continuous active learning is the opposite of ``patient''. It starts to train the model as soon as \textit{ONE} ``relevant'' study shows up and skips the uncertainty sampling stage, which is believed to be essential for active learners~\cite{settles2012active}. Since the objective is to retrieve ``relevant'' studies with candidates reviewed as few as possible, it is reasonable not to waste any single effort on building up the classifier~\cite{cormack2014evaluation,tredennick2015}. Also, the experiment results in~\cite{cormack2014evaluation} has demonstrated the value of this ``greedy'' strategy.
+
+
+
+
+\section{Methods}
+\label{sect: Method}
+
+This section describes our data sets and their preparation then describes and refactors state-of-the-art methods for human-in-the-loop incremental learning.
+This refactoring process will create FASTREAD, our preferred human-in-the-loop incremental learning
+method. 
+
+\subsection{Data Sets}
+\label{sect: Data Sets}
+
+Although a large number of SLRs are published every year, there is no data set clearly documenting the details in primary study selection. As a result, two data sets are collected from existing SLRs and being used in this study to simulate the process of excluding irrelevant studies\footnote{Available at \textit{https://doi.org/10.5281/zenodo.192506}}. The first data set is extracted from the SLR on defect prediction by Wahono in 2015~\cite{wahono2015systematic}. The second data set is extracted from the SLR on defect prediction by Hall and et al. in 2012~\cite{hall2012systematic}. 
+
+For each of the data set, we retrieve the initial candidate collection from IEEE Xplore with the search string stated in the original literature. Then make a final list of inclusion by comparing the initial collection retrieved and the final list proposed in the corresponding SLR. Here, for simplicity reason we only extract candidate studies from single data source, IEEE Xplore. We will explore possibilities for efficiently utilizing multiple data sources in the future work but in this paper, without loss of generality, we only extract initial candidate list from single data source. 
+
+The number of studies we retrieved from IEEE Xplore is listed in ``Retrieved'' columns of Table~\ref{tab: number}. On the other hand, in their original publications~\cite{wahono2015systematic,hall2012systematic}, the candidate primary studies are collected from multiple databases. The number of studies they retrieved is listed in ``Stated'' columns of Table~\ref{tab: number}.
+
+\begin{table}
+\caption{Descriptive statistics for experimental data sets}
+\label{tab: number}
+\begin{center}
+\begin{tabular}{ |l|c|c|c|c| }
+  \hline
+   & \multicolumn{2}{|c|}{Wahono} & \multicolumn{2}{|c|}{Hall}\\
+  \cline{2-5}
+  & Stated & Retrieved & Stated & Retrieved\\
+  \hline
+  Initial list & 2117 & 7002 & 2073 & 8911\\
+  \hline
+  Final list & 72 & 62 & 136 & 106 \\
+  \hline
+\end{tabular}
+\end{center}
+{\footnotesize ``Stated'' column presents the number of studies listed in the original papers, while ``Retrieved'' column presents the number of studies we found using the same search string from IEEE Xplore. The ``Retrieved'' final list is the intersection of ``Stated'' final list and ``Retrieved'' initial list.}
+\end{table}
+
+
+In~\cite{wahono2015systematic}, Wahono et al. applied the following search string
+\begin{quote}\textit{(software OR applicati* OR systems ) AND (fault* OR
+defect* OR quality OR error-prone) AND (predict*
+OR prone* OR probability OR assess* OR detect* OR
+estimat* OR classificat*)}
+\end{quote}
+to databases including IEEE Xplore, ACM Digital Library, ScienceDirect, Springer, and Scopus, to retrieve the initial candidate study set. After deduplication, an initial list of 2117 candidate studies are found. As a result of linearly review all 2117 studies, a final inclusion list of 71 studies are identified. On the other hand, we retrieve much more candidates with the same search string just from IEEE Xplore and cover about 85\% of the final list, as shown in Table~\ref{tab: number}. The final Wahono data set contains 7002 studies and 62 of which are labeled as ``relevant''.
+
+In~\cite{hall2012systematic}, Hall et al. applied the following search string
+\begin{quote}{\em (Fault* OR bug* OR defect* OR errors OR corrections OR corrective OR fix*) \textit{in title only}
+AND (Software) \textit{anywhere in study} }
+\end{quote}
+to databases including IEEE Xplore, ACM Digital Library, and ISI Web of Science, to retrieve the initial candidate study set. After deduplication, an initial list of 2073 candidate studies are found. As a result of linearly review all 2073 studies, a final inclusion list of 136 studies are identified. On the other hand, we again retrieve much more candidates with the same search string just from IEEE Xplore and cover about 75\% of the final list, as shown in Table~\ref{tab: number}. The final Hall data set contains 8911 studies and 106 of which are labeled as ``relevant''.
+
+As shown in Table~\ref{tab: number}, the two data sets are still not exactly the same as described in the original studies~\cite{wahono2015systematic,hall2012systematic}. The differences are from two aspects: 
+
+\begin{itemize}
+
+\item
+More candidate studies are retrieved with the same search string than those in~\cite{wahono2015systematic,hall2012systematic};
+
+\item
+Not all the ``relevant'' studies in the final inclusion lists of~\cite{wahono2015systematic,hall2012systematic} are in our retrieved candidate study list.
+
+\end{itemize}
+
+The first difference is because, as stated in~\cite{wahono2015systematic}, the search string is always refined manually in order to retrieve a satisfied candidate study list. This effort is always not exposed in SLRs and thus hinders our attempt to reproduce the candidate study list. This refinement of search string is actually a common attempt to reduce the size of candidate study list, thus save review effort in primary study selection with some sacrifice on completeness. With human-in-the-loop primary study selection, the refinement of the search string is no longer necessary, because we can now tackle large candidate study list with a small amount of effort. Therefore, it is possible that the completeness will even increase when 90\% of ``relevant'' studies are retrieved, given that we now have a richer candidate list of studies.
+
+The second difference is mainly because the candidate study lists are retrieved from IEEE Xplore only, while some of the ``relevant'' studies in the final inclusion lists of~\cite{wahono2015systematic,hall2012systematic} are not in IEEE Xplore. It is for simplicity of the experiments since IEEE Xplore covers most of the studies. This may lead to a sampling bias between our experiment and real SLR process. However, we believe that our data sets are representative enough to compare different human-in-the-loop incremental learning methods in Section~\ref{sect: Algorithm Code}.
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Learning_based_primary_study_selection.pdf}
+    \caption{Human-in-the-loop Primary study selection.}
+    \label{fig: learning}
+\end{figure}
+
+\subsection{Human-in-the-loop Primary Study Selection}
+\label{subsect: Learning based Primary Study Selection}
+
+
+In contrast to the classical primary study procedures in Fig.~\ref{fig: prime}, the general form of human-in-the-loop primary study selection is presented in
+Fig.~\ref{fig: learning}. Reviewers first review the title and abstract of the
+suggested study, determine whether it is ``relevant'' or not. If the study is
+``relevant'' by title and abstract, the reviewer will then read the full text of
+the study and make the final decision. In the meantime, all the reviewed
+studies, labeled as ``relevant'' or ``irrelevant'', will go into the training
+set. Note that only the title and abstract of the training set studies will be used to
+train the human-in-the-loop incremental learning model, thus making data extraction for training examples easy.
+
+The objective of Human-in-the-loop primary study selection (or machine learning
+assisted citation screening or TAR) is different from that of common active
+learning scenario. Instead of trying to build a classifier as good as possible,
+human-in-the-loop primary study selection seeks methods to retrieve almost every
+``relevant'' studies with candidate studies reviewed as few as possible. This
+difference in the objective leads to a different performance metrics (further explained in Section~\ref{subsect: Performance Metrics}) and thus
+makes conventional active learning methods being outperformed by specially
+designed methods like patient active learning in evidence-based
+medicine~\cite{wallace2010semi} and continuous active learning in
+e-discovery~\cite{cormack2014evaluation,cormack2015autonomy}.
+
+
+
+\subsection{Algorithm Code}
+\label{sect: Algorithm Code}
+
+In order to utilize the advantages of both patient active learning and continuous active learning, we test and compare various of different combinations of the two algorithms in our experiments, Section~\ref{sect: Experiments}. The algorithms are coded following the principles below:
+
+\begin{itemize}
+
+\item
+{\bf Code $P$}. 
+
+\textbf{$P$} stands for ``patient''. The algorithm keeps random sampling until a sufficient number of ``relevant'' studies retrieved, as suggested in patient active learning. In our experiments, the sufficient number of ``relevant'' studies retrieved is set to $5$, which means when at least $5$ ``relevant'' studies have been retrieved by random sampling, the algorithm goes into next stage.
+
+\textbf{$\bar{P}$} is the opposite. The algorithm stops random sampling as long as {\em ONE} ``relevant'' studies are retrieved, as suggested in continuous active learning.
+
+\item
+{\bf Code $U$}. 
+
+\textbf{$U$} stands for ``uncertainty sampling''. The algorithm utilizes
+uncertainty sampling to build the classifier, as suggested in patient active
+learning. In our experiments, classifier is treated as ``stable'' once the margin
+of SVM model is greater or equal to $2$. Uncertainty sampling stops once the
+classifier is stable and goes into next step. Thereafter, certainty sampling
+will start and the candidate studies with highest probability to be ``relevant''
+will be returned. Fig.~\ref{fig:test} and \ref{fig:test_a} shows the
+difference between uncertainty sampling and certainty sampling where uncertainty
+sampling returns Group A and certainty sampling returns Group B.
+
+\textbf{$\bar{U}$} skips uncertainty sampling step and goes directly to certainty sampling with classifier retrained each round, as suggested in continuous active learning.
+
+\item
+{\bf Code $S$}. 
+
+\textbf{$S$} stands for when to ``stop training''. The algorithm stops training
+once the classifier is stable, as suggested in patient active learning.
+
+\textbf{$\bar{S}$} stands for ``continuous learning''. The algorithm never stops
+training as suggested in continuous active learning.
+
+\item
+{\bf Code $A$}. 
+
+\textbf{$A$} stands for ``aggressive undersampling''. The algorithm utilizes aggressive undersampling when performing certainty sampling\footnote{We noticed that aggressive undersampling should not be performed with too few ``relevant'' training examples, as it only keeps twice the number of ``relevant'' training examples. Specifically, in $\bar{P}\bar{U}\bar{S}A$, certainty sampling with a classifier trained with only two examples leads to a huge deterioration in performance. Therefore we set a threshold for performing aggressive undersampling, i.e. not to begin aggressive undersampling until $M$ ``relevant'' studies have been retrieved, where $M=30$ in our experiment since a sample size of $30$ is usually
+enough to approximate the distribution of each class~\cite{isotalo2001basics}.}, as suggested by patient active learning. Fig.~\ref{fig:train_a} shows how an SVM is trained with aggressive undersampling and Fig.~\ref{fig:test_a} shows how the prediction is affected.
+
+\textbf{$\bar{A}$} stands for no data balancing. The algorithm does not apply any data balancing method when performing certainty sampling, as suggested by continuous active learning.
+
+\end{itemize}
+
+As a result, we ended up with 12 (\textbf{Code $\bar{U}$} and \textbf{Code $S$} cannot coexist) algorithms including patient active learning as $PUSA$ and continuous active learning as $\bar{P}\bar{U}\bar{S}\bar{A}$. All the 12 algorithms are tested and compared in Section~\ref{sect: Experiments}.
+
+\section{Experiments}
+\label{sect: Experiments}
+
+This section describes the experimental procedures that we used to evaluate the algorithms described in Section~\ref{subsect: Learning based Primary Study Selection} on the data sets described in Section~\ref{sect: Data Sets}. 
+
+There is no human activity involved in these experiments, thus makes them repeatable and reproducible. Each experiment is a simulation of one specific human-in-the-loop incremental learning method on one data set:
+
+\begin{enumerate}
+\item
+Starts with an unlabeled collection of candidate studies (8911 in Hall and 7002 in Wahono, as shown in Table~\ref{tab: number}).
+
+\item
+\label{select}
+Train a model on current labeled examples.
+
+\item
+Select $N=10$ studies from the prediction of machine learning model on unlabeled examples for review.
+
+\item
+Query the true labels of the selected studies (106 ``relevant'' and 8805 ``irrelevant'' in Hall, 62 ``relevant'' and 6940 ``irrelevant'' in Wahono, as shown in Table~\ref{tab: number}), label them as their true labels.
+
+\item
+Go back to \ref{select} until finished.
+
+\end{enumerate}
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.48\linewidth]{Preprocessing.pdf}
+    \caption{Preprocessing process suggested by~\cite{krishna2016bigse}.}
+    \label{fig: preprocessing}
+\end{figure}
+
+\subsection{Controlled Variables}
+\label{subsect: Controlled Variables}
+
+For the sake of a fair comparison, different algorithms in Section~\ref{sect: Algorithm Code} share an identical set of controlled variables including preprocessing and classifier. 
+
+\subsubsection{Preprocessing}
+
+Each candidate study in the initial list is first tokenized by stemming and stop words removal after concatenating its title and abstract. After tokenization, the bag of words are featurized into a term frequency vector. Then, reduce the dimensionality of the term frequency vector with feature hashing and normalize the hashed matrix by its L2 norm each row at last. The whole preprocessing process is presented in Fig.~\ref{fig: preprocessing}. This preprocessing process is suggested and justified by~\cite{krishna2016bigse}.
+
+
+\subsubsection{Classifier}
+
+For this work we use a
+linear SVM as the classifier.
+SVMs learn a hyperplane that separate relevant from irrelevant examples
+in the training data.
+Linear SVMs do not make complicated assumptions about the data space
+and so are known to scale to very large, high-dimensional
+problems~\cite{joachims2006training}. Such linear SVMs are widely used in text
+mining~\cite{krishna2016bigse}.
+SVM's hyperplane is a natural tool for deciding what examples
+to show next to the human user. As discussed in Section~\ref{sect: Technical Briefing}, uncertainty sampling prefers the examples
+{\em closest} to the hyperplane boundary since these are the ones whose classification will
+change, given small changes to the test data.
+On the other hand, certainty sampling prefers
+the examples {\em furthest} from this boundary since they are the ones that SVM is most certain about. 
+
+
+
+
+\subsection{Performance Metrics}
+\label{subsect: Performance Metrics}
+
+Common active learning aims for building a better model with less training. Therefore its performance metrics is usually some \textbf{accuracy, precision, recall} on the model prediction vs \textbf{training size} curve. The \textbf{accuracy, precision, recall} are measured on some validation set.
+
+On the other hand, since the goal of human-in-the-loop primary study selection described in Section~\ref{subsect: Learning based Primary Study Selection} is different from that of common active learning, the performance metrics is also different. In human-in-the-loop primary study selection, the performance of each algorithm is evaluated by its \textbf{recall} vs. \textbf{studies reviewed} curve. The \textbf{recall} here is not a measurement on the trained model, but the number of ``relevant'' studies retrieved over the total number of ``relevant'' studies. An algorithm is better than the other if it can retrieve more ``relevant'' studies with less studies reviewed, in other words, the upper left corner is the winning zone in this \textbf{recall} vs. \textbf{studies reviewed} curve. This performance metrics is suggested by~\cite{cormack2015autonomy,cormack2014evaluation,tredennick2015} and best fits the objective of human-in-the-loop primary study selection.
+
+Each experiment repeats $30$ times\footnote{It is suggested that usually a sampling size of $30$ is adequate~\cite{isotalo2001basics}.}, the medians and different percentiles for every algorithm are collected and plotted on the graph. Every algorithm is compared by the corresponding values. A higher median in recall means the algorithm is able to retrieve more ``relevant'' studies with same amount of studies reviewed. The closer the results from different percentiles are, the less variance an algorithm has, thus more stable.
+
+
+
+
+
+\subsection{Results}
+\label{subsect: Results}
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.48\linewidth]{IST_B_Wahono.eps}
+    \includegraphics[width=0.48\linewidth]{IST_B_Hall.eps}
+    \caption{For RQ1, comparison between the state-of-the-art human-in-the-loop incremental learning methods (continuous active learning and patient active learning) and linear review. Recall on Y axis represents the percentile of ``relevant'' studies being retrieved. X axis shows the number of studies reviewed with both absolute value and percentage of whole population in the brackets. Median values of recall in $30$ runs are presented. One method is better than another if fewer studies reviewed to achieve same recall.}
+    \label{fig:baselines}
+\end{figure*}
+
+{\bf RQ1: Can human-in-the-loop incremental learning techniques reduce cost in primary study selection?} 
+
+In Fig.~\ref{fig:baselines}, we tested two state-of-the-art human-in-the-loop incremental learning techniques, patient active learning
+from evidence-based medicine and continuous active learning from electronic
+discovery, on our collected SE SLR data sets. On each data set, human-in-the-loop incremental learning techniques perform remarkably better than linear review. Both human-in-the-loop incremental learning techniques found most of the ``relevant'' studies by reviewing 2500 studies while linear review only found about $30\%$.
+
+\begin{lesson}
+    Yes, human-in-the-loop incremental learning techniques can reduce cost dramatically in primary study selection.
+\end{lesson}
+
+
+
+\begin{figure*}
+    \centering
+    
+    \subfigure[Is aggressive undersampling useful? Comparison for \textbf{Code A}.]
+    {
+        \includegraphics[width=0.48\linewidth]{IST_4_Wahono.eps}
+        \includegraphics[width=0.48\linewidth]{IST_4_Hall.eps}
+        \label{fig:4th}
+    }
+    \quad
+    \subfigure[Is continuous learning useful? Comparison for \textbf{Code S}.]
+    {
+        \includegraphics[width=0.48\linewidth]{IST_3_Wahono.eps}
+        \includegraphics[width=0.48\linewidth]{IST_3_Hall.eps}
+        \label{fig:3rd}
+    }
+    \quad
+    \subfigure[Is uncertainty sampling useful? Comparison for \textbf{Code U}.]
+    {
+        \includegraphics[width=0.48\linewidth]{IST_2_Wahono.eps}
+        \includegraphics[width=0.48\linewidth]{IST_2_Hall.eps}
+        \label{fig:2nd}
+    }
+    \quad
+    \subfigure[Is patient useful? Comparison for \textbf{Code P}.]
+    {
+        \includegraphics[width=0.48\linewidth]{IST_1_Wahono.eps}
+        \includegraphics[width=0.48\linewidth]{IST_1_Hall.eps}
+        \label{fig:1st}
+    }
+    \quad
+    \subfigure[Is FASTREAD better than state-of-the-art treatments?]
+    {
+        \includegraphics[width=0.48\linewidth]{IST_0_Wahono.eps}
+        \includegraphics[width=0.48\linewidth]{IST_0_Hall.eps}
+        \label{fig: baseline}
+    }   
+    
+    
+    
+    \caption{(a) to (d) are paired comparisons of different methods with results from Wahono data set on the left hand side and results from Hall data set on the right hand side. Each paired comparison answers one sub research question. (a) to (d) answer RQ2.1 to RQ2.4, respectively. (e) compares our recommended method FASTREAD with the two state-of-the-art methods, thereby answers RQ2. Recall on Y axis represents the percentile of ``relevant'' studies being retrieved. X axis shows the number of studies reviewed with both absolute value and percentage of whole population in the brackets. Median values of recall in $30$ runs are presented.  One method is better than another if fewer studies reviewed to achieve same recall.
+    }
+    \label{fig:detail}
+\end{figure*}
+
+
+
+{\bf RQ2: Should we just adopt the state-of-the-art methods from other fields? Is it possible to build a better one by mixing and matching from those?}
+
+Derived from the results on Wahono set, Fig.~\ref{fig:baselines}, continuous active learning performs better than patient active learning before reaching $80\%$ recall, but is outperformed after reaching $80\%$ recall. Such interesting observation leads to the mixing and matching from the two state-of-the-art methods. As a result, twelve different human-in-the-loop incremental learning methods are compared in the following experiments, including patient active learning ($PUSA$) and continuous active learning ($\bar{P}\bar{U}\bar{S}\bar{A}$).  A set of paired comparisons are made to further compare each component of the methods as shown in Fig.~\ref{fig:4th}-\ref{fig:1st}.
+
+
+\textbf{RQ2.1}: Is aggressive undersampling useful?
+
+Aggressive undersampling was first proposed along with patient active learning method in~\cite{wallace2010semi}. Therefore we compare the results of two treatments:
+\begin{itemize}
+\item the ``no'' treatment of $PUS\bar{A}$ (without aggressive undersampling)
+\item and the ``yes'' treatment of $PUSA$ (patient active learning). 
+
+Note that if ``yes''
+performs better then this would make us say ``yes'' to ``Is aggressive undersampling useful?''.
+\end{itemize}
+As shown in Fig.~\ref{fig:4th}, ``yes'' outperforms ``no'' on on both data sets. Therefore the answer to RQ2.1 is yes, aggressive undersampling is useful and plays an important role in human-in-the-loop incremental learning.
+
+\textbf{RQ2.2}: Is continuous learning useful?
+
+The winner from last paired comparison, $PUSA$ (patient active learning) suggests that learning should be stopped after classifier is ``stable''. On the other hand, continuous active learning in~\cite{cormack2014evaluation} suggests that we should never stop learning. Therefore we compare the results of two treatments:
+
+\begin{itemize}
+\item the ``no'' treatment of $PUSA$ (patient active learning, stops learning after ``stable''.)
+\item and the ``yes'' treatment of $PU\bar{S}A$ (continue learning). 
+
+Note that if ``yes''
+performs better then this would make us say ``yes'' to ``Is continuous learning useful?''.
+\end{itemize}
+
+According to Fig.~\ref{fig:3rd}, ``yes'' performs a little bit better than ``no'' on Wahono data set. Although there is no clear winner, we recommend continuous learning due to its ability to tackle concept drift and continuous update of SLR. Therefore the answer to RQ2.2 is that continuous learning has no remarkable impact on performance, but it is suggested because of other reasons.
+
+\textbf{RQ2.3}: Is uncertainty sampling useful?
+
+The winner from last paired comparison, $PU\bar{S}A$ suggests that uncertainty sampling should be applied in the early stage to build the classifier. On the other hand, continuous active learning suggests that uncertainty sampling is not necessary. Therefore we compare the results of two treatments:
+
+\begin{itemize}
+\item the ``no'' treatment of $PU\bar{S}A$ (with uncertainty sampling)
+\item and the ``yes'' treatment of $P\bar{U}\bar{S}A$ (without uncertainty sampling). 
+
+Note that if ``yes''
+performs better then this would make us say ``yes'' to ``Is uncertainty sampling useful?''.
+\end{itemize}
+
+According to Fig.~\ref{fig:2nd}, there are no clear differences in performance between these two treatments. Both are kept for the next round of paired comparison. The answer to RQ2.3 is that uncertainty sampling is not a must-have. This is a shocking result as most of the literature about active learning suggest that uncertainty sampling is indispensable in fast building up a good model. However, the objective of human-in-the-loop incremental learning is different from general active learning task. Instead of trying to build a classifier as good as possible, human-in-the-loop incremental learning seeks methods to retrieve almost every ``relevant'' studies with candidate studies reviewed as few as possible. This particular objective of human-in-the-loop incremental learning makes certainty sampling equally or even more competitive to uncertainty sampling. Similar results have been found in~\cite{cormack2014evaluation}.
+
+\textbf{RQ2.4}: Is patient useful?
+
+The winners from last paired comparison, $PU\bar{S}A$ and $P\bar{U}\bar{S}A$ suggest that we should wait until enough ``relevant'' examples have been retrieved before training an SVM model. On the other hand, continuous active learning suggests that training should start as soon as
+one ``relevant'' example retrieved. Therefore, we compare the results of four treatments:
+
+\begin{itemize}
+\item the ``no'' treatment of $\bar{P}U\bar{S}A$ (without patient),
+\item the ``no'' treatment of $\bar{P}\bar{U}\bar{S}A$ (without patient),
+\item the ``yes'' treatment of $P\bar{U}\bar{S}A$ (with patient), 
+\item and the ``yes'' treatment of $PU\bar{S}A$ (with patient). 
+
+Note that if both ``yes'' treatments performs better then this would make us say ``yes'' to ``Is patient useful?''.
+\end{itemize}
+
+According to Fig.~\ref{fig:1st}, ``no'' treatments are clear winners. The two ``no'' treatments, $\bar{P}U\bar{S}A$ and $\bar{P}\bar{U}\bar{S}A$, have similar performance. Thus the answer to RQ3.5 is no, patient is not useful, training the SVM model as soon as ONE ``relevant'' example retrieved performs better. This result is also surprising. A reasonable explanation can still be drawn from the objective of human-in-the-loop incremental learning, as RQ2.4. By sacrificing some performance of early SVM model, we gain advantage of finding more ``relevant'' studies earlier. Similar results are also found in~\cite{cormack2014evaluation}.
+
+
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.48\linewidth]{percentile_Wahono.eps}
+    \includegraphics[width=0.48\linewidth]{percentile_Hall.eps}
+    \caption{Percentile graph of two treatments, $\bar{P}\bar{U}\bar{S}A$ as in solid lines and $\bar{P}U\bar{S}A$ as in dashed lines. All runs stop at $90\%$ recall for a fair comparison on review effort. RQ2.5 is answered here by comparing FASTREAD ($\bar{P}\bar{U}\bar{S}A$), the recommended treatment, with $\bar{P}U\bar{S}A$. The two treatments are similar regarding to median performance. However, according to the percentile graph, FASTREAD is better than $\bar{P}U\bar{S}A$ in terms of variance. Specifically, the worst case performance of FASTREAD is much better than that of $\bar{P}U\bar{S}A$.}
+    \label{fig:percentile}
+\end{figure*}
+
+\textbf{RQ2.5}: What is the recommended treatment?
+
+Considering all the above comparisons, we end up with two winners among the twelve treatments in terms of median performance, $\bar{P}U\bar{S}A$ and $\bar{P}\bar{U}\bar{S}A$. These two treatments are indistinguishable in terms of median performance and both outperforms the state-of-the-art treatments.
+
+To further compare the two methods, the variances of both $\bar{P}U\bar{S}A$ and $\bar{P}\bar{U}\bar{S}A$ in $30$ runs are shown in Fig.~\ref{fig:percentile}, in which the best and worst cases, along with 50, 75, 90 percentile cases are plotted. Although $\bar{P}U\bar{S}A$ and $\bar{P}\bar{U}\bar{S}A$ have similar median performance, the variance of $\bar{P}\bar{U}\bar{S}A$ is less than that of $\bar{P}U\bar{S}A$ as shown in Fig.~\ref{fig:percentile}. Especially in the worst cases, $\bar{P}\bar{U}\bar{S}A$ performs remarkably better than $\bar{P}U\bar{S}A$ (purple curves). Thus the answer to RQ2.5 is that the recommended treatment is $\bar{P}\bar{U}\bar{S}A$, which we call FASTREAD.
+
+As shown as solid lines in Fig.~\ref{fig:percentile}, variance of FASTREAD are extremely low in $75\%$ of the cases, where reviewers need to review $5\%$ (/$10\%$) to retrieve $90\%$ of the ``relevant'' studies in Hall (/Wahono) data set. Causing by the instability of random sampling, in $10\%$ of the cases, the review cost is increased by $50\%$, while in the worst case result, the review effort is doubled. The reason behind is that the number of studies reviewed before the first ``relevant'' one appears can vary. For example, the prevalence of ``relevant'' studies in Hall is $106/8911=0.012$, there is a $(1-0.12)^{200}=9\%$ of chance that the first $200$ studies reviewed has no ``relevant'' studies in it. How to reduce variance when building the seed set is a problem and we are planning to address it in our future work.
+
+
+
+\textbf{RQ2.6}: Is FASTREAD better than the state-of-the-art treatments?
+
+In order to answer RQ2.6, we compare the results of following three treatments:
+
+\begin{itemize}
+\item the recommended treatment of $\bar{P}\bar{U}\bar{S}A$ (FASTREAD),
+\item the state-of-the-art evidence-based medicine treatment of $PUSA$ (patient active learning),
+\item and the state-of-the-art e-discovery treatment of $\bar{P}\bar{U}\bar{S}\bar{A}$ (continuous active learning). 
+
+Note that if FASTREAD performs the best then this would make us say ``yes'' to ``Is there a treatment better than the state-of-the-art treatments?''.
+\end{itemize}
+
+As demonstrated in Fig.~\ref{fig: baseline}, FASTREAD outperforms others. Therefore the answer to RQ2.6 is yes, FASTREAD is better than the state-of-the-art treatments. 
+
+
+To sum up: the recommended human-in-the-loop incremental learning treatment for primary study selection is FASTREAD ($\bar{P}\bar{U}\bar{S}A$), which randomly samples until {\em ONE}
+``relevant'' study has been retrieved, then keeps certainty sampling until $M=30$ ``relevant'' studies are retrieved, after that keeps certainty sampling with aggressive undersampling. It is among the best performance treatments, and it outperforms both the state-of-art treatments in evidence-based medicine and e-discovery. Continuous learning also empower it the capability to handle concept drift and continuous update of SLR. 
+
+
+
+\begin{lesson}
+    No, we should not just adopt the state-of-the-art methods from other fields. A better method called FASTREAD is generated by mixing and matching from the state-of-the-art methods.
+\end{lesson}
+
+
+
+
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.6\linewidth]{PoR.eps}
+    \caption{The precision of FASTREAD for different target recall. Highest precisions are achieved around 0.8 recall. After 0.9 recall, precisions drop dramatically.}
+    \label{fig:precision}
+\end{figure}
+
+\textbf{RQ3: How much effort can FASTREAD save in an SLR?}
+
+In order to answer RQ3, let's first answer the following research questions:
+
+\textbf{RQ3.1}: When should FASTREAD stop?
+
+$100\%$ recall can never be achieved unless all the candidate studies have been reviewed, thus sacrificing recall (completeness) is a must if we want to save review effort in SLR. Precision, (number of ``relevant'' studies retrieved) / (number of studies reviewed), measures the efficiency of the review. The higher the precision, the more efficient the review is. Therefore precision should be taken into consideration since our goal is higher recall on less review effort. According to Fig.~\ref{fig:precision}, highest precision can be achieved on both sets if FASTREAD stops at around $80\%$ recall. After $90\%$ recall, precision drops dramatically. Typically, increasing recall from $90\%$ to $95\%$ will double the review cost of FASTREAD. As a result, we suggest FASTREAD to stop at $90\%$ recall where precision just starts to drop. In practice, recall is unavailable. Thus another practical reason for stopping at $90\%$ recall is that, with the precision drop, reviewer can sense the plateau and know when to stop. 
+
+
+\begin{table*}[t]
+\caption{Scott-Knott analysis for number of studies reviewed to reach $90\%$ recall}
+\label{tab: scottknott}
+\begin{center}
+
+\begin{subtable}
+{\scriptsize \begin{tabular}{l@{~~~}l@{~~~}r@{~~~}r@{~~~}c}
+\arrayrulecolor{lightgray}
+\textbf{Rank} & \textbf{Treatment} & \textbf{Median} & \textbf{IQR} & \textbf{Wahono}\\\hline
+  \rowcolor{green!30}
+  1 & $\bar{P}\bar{U}\bar{S}A$ (FASTREAD)&    680  &  130 & \quart{0}{1}{0}{-8} \\
+  1 & $\bar{P}U\bar{S}A$ &    700  &  150 & \quart{0}{2}{0}{-8} \\
+\hline  2 & $\bar{P}USA$ &    840  &  350 & \quart{0}{5}{2}{-8} \\
+  2 & $P\bar{U}\bar{S}A$ &    1060  &  320 & \quart{4}{5}{5}{-8} \\
+  2 & $PU\bar{S}A$ &    1090  &  330 & \quart{4}{4}{6}{-8} \\
+  \rowcolor{blue!30}  
+  2 &       $PUSA$ (PAL) &    1140  &  280 & \quart{5}{4}{7}{-8} \\
+  2 & $\bar{P}U\bar{S}\bar{A}$ &    1340  &  140 & \quart{8}{2}{9}{-8} \\
+  \rowcolor{blue!30}
+  2 & $\bar{P}\bar{U}\bar{S}\bar{A}$ (CAL) &    1350  &  130 & \quart{9}{1}{9}{-8} \\
+\hline  3 & $P\bar{U}\bar{S}\bar{A}$ &    1640  &  370 & \quart{11}{5}{13}{-8} \\
+  3 & $PU\bar{S}\bar{A}$ &    1640  &  380 & \quart{11}{5}{13}{-8} \\
+\hline  4 & $\bar{P}US\bar{A}$ &    2240  &  1440 & \quart{15}{20}{22}{-8} \\
+  4 & $PUS\bar{A}$ &    2490  &  770 & \quart{21}{11}{25}{-8} \\
+  \rowcolor{red!30}
+\hline  5 & Linear Review &    6240  &  310 & \quart{75}{4}{77}{-8} \\
+\hline \end{tabular}}
+\end{subtable}
+\begin{subtable}
+{\scriptsize \begin{tabular}{l@{~~~}l@{~~~}r@{~~~}r@{~~~}c}
+\arrayrulecolor{lightgray}
+\textbf{Rank} & \textbf{Treatment} & \textbf{Median} & \textbf{IQR} & \textbf{Hall}\\\hline
+  1 & $\bar{P}U\bar{S}\bar{A}$ &    290  &  70 & \quart{0}{0}{0}{-2} \\
+  1 & $\bar{P}U\bar{S}A$ &    300  &  70 & \quart{0}{0}{0}{-2} \\
+  \rowcolor{green!30}
+  1 & $\bar{P}\bar{U}\bar{S}A$ (FASTREAD) &    310  &  30 & \quart{0}{0}{0}{-2} \\
+  \hline  2 & $\bar{P}USA$ &    320  &  80 & \quart{0}{0}{0}{-2} \\
+  \rowcolor{blue!30}
+  2 & $\bar{P}\bar{U}\bar{S}\bar{A}$ (CAL)&    350  &  70 & \quart{0}{1}{0}{-2} \\
+  2 & $\bar{P}US\bar{A}$ &    350  &  100 & \quart{0}{1}{0}{-2} \\\hline
+  3 & $PU\bar{S}A$ &    620  &  260 & \quart{2}{3}{3}{-2} \\
+  \rowcolor{blue!30}
+  3 &       $PUSA$ (PAL) &    630  &  270 & \quart{2}{3}{3}{-2} \\
+  3 & $P\bar{U}\bar{S}A$ &    660  &  340 & \quart{2}{4}{3}{-2} \\
+  3 & $P\bar{U}\bar{S}\bar{A}$ &    680  &  240 & \quart{3}{3}{4}{-2} \\
+  3 & $PU\bar{S}\bar{A}$ &    680  &  230 & \quart{3}{2}{4}{-2} \\
+  3 & $PUS\bar{A}$ &    750  &  230 & \quart{3}{3}{4}{-2} \\
+  \rowcolor{red!30}
+  \hline  4 & Linear Review &    7880  &  250 & \quart{77}{2}{78}{-2} \\
+\hline \end{tabular}}
+\end{subtable}
+
+\end{center}
+{\footnotesize Simulations are repeated for $30$ times, medians ($50$th percentile) and iqrs (($75$-$25$)th percentile) are presented. Smaller median value represents better performance while smaller iqr means better stability. Treatments with same rank have no significant difference in performance while treatments of lower rank are significantly better than those of higher rank. FASTREAD is colored in green while the state-of-the-art treatments are colored in blue and linear review is colored in red.}
+
+\end{table*}
+
+
+
+Considering this stop rule, for each method, the number of studies need to be reviewed for retrieving $90\%$ relevant  studies is compared using Scott-Knott Analysis. As shown in Table~\ref{tab: scottknott}, FASTREAD is of the top rank methods on both data set and is significantly better than linear review and the two state-of-the-art methods, patient active learning (PAL) and continuous active learning (CAL).
+
+\textbf{RQ3.2}: How many studies need to be reviewed at $90\%$ recall?
+
+On Hall data set, in order to achieve a $90\%$ recall, a median value of $310$ studies need to be reviewed, which is $3.5\%$ of the total population.
+
+On Wahono data set, in order to achieve a $90\%$ recall, a median value of $680$ studies need to be reviewed, which is $9.7\%$ of the total population.
+
+
+
+\begin{figure}[t]
+    \centering
+    \begin{minipage}[t]{.48\linewidth}
+    \includegraphics[width=\linewidth]{Reviewcost.png}    
+    \caption{Number of studies reviewed to achieve $90\%$ recall.}
+    \label{fig:reviewcost}
+    \end{minipage}
+    \begin{minipage}[t]{.48\linewidth}
+    \includegraphics[width=\linewidth]{runtime.png}    
+    \caption{Runtime cost to achieve $90\%$ recall, measured in minutes, logarithmic scale. The review time in red is estimated as 3 hours for every 100 studies~\cite{malheiros2007visual}.}
+    \label{fig:runtime}
+    
+\end{minipage}
+\end{figure}
+
+
+% \begin{figure}[t]
+%     \centering
+    
+% \end{figure}
+To sum up, for RQ3, only hundreds of studies (around $5$ to $10\%$ of the total population) need to be reviewed in order to retrieve $90\%$ of the ``relevant'' studies, which implies a $90\%$ of review effort saved by FASTREAD. Fig.~\ref{fig:reviewcost} compares the review cost for $90\%$ recall of FASTREAD and linear review.
+
+\begin{lesson}
+    Our results suggest that FASTREAD can save $90\%$ of the review effort while retrieving $90\%$ of the ``relevant'' studies.
+\end{lesson}
+
+
+
+
+
+
+
+
+\section{Tool Support}
+\label{sect: tool}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\linewidth]{MAR.png}
+    \caption{Basic interface of the FASTREAD tool.}
+    \label{fig:FASTREAD}
+\end{figure*}
+
+
+\begin{figure*}[t]
+    \centering
+    \subfigure[Input format]
+    {
+        \includegraphics[width=0.48\linewidth]{Input.png}\label{fig:input}
+    }
+    \subfigure[Output format]
+    {
+        \includegraphics[width=0.48\linewidth]{Output.png}\label{fig:output}
+    }    
+    
+    \caption{Data format for FASTREAD tool.}
+    \label{fig:csv}
+\end{figure*}
+
+In order to implement FASTREAD, we developed a simple tool as shown in Fig.~\ref{fig:FASTREAD}. This software is freely available from SeaCraft Zenodo at \textit{https://doi.org/10.5281/zenodo.546749} and its Github repository at \textit{https://github.com/fastread/src}. 
+
+
+Using FASTREAD, a review starts with \textbf{A}: selecting the input candidate study list from \textit{workspace/data/} directory. The input candidate list is specified in the format shown in Fig.~\ref{fig:input}. The input CSV file must have the \textit{Document Title}, \textit{Abstract}, \textit{Year}, and \textit{PDF Link} columns. The \textit{label} column, which is the true label of the candidate studies, is optional and is only used for testing. The output CSV file generated by the FASTREAD tool has an additional \textit{code} column, which is the reviewer-decided label for the candidate study. The final inclusion list can be retrieved by extracting all the studies with ``yes'' in the \textit{code} column.
+
+Using FASTREAD, the review then proceeds as follows:
+\begin{enumerate}
+\item[\textbf{B}] Randomly select $10$ candidate studies for review.
+\item[\textbf{C}] Read through the title and abstract (and click on the title and read the full text if needed) of the candidate study.
+\item[\textbf{D}] Decide whether this study should be coded as \textit{Relevant} or \textit{Irrelevant} and click the \textit{Submit} button.
+\item[\textbf{E}] Click the \textit{Next} button and the codes are saved. Another $10$ candidate studies will be selected for review.
+\item[\textbf{F}] The review status will change every time new studies are coded by reviewer and the \textit{Next} button is hit. The status is shown in the format ``Documents Coded: \textit{Number of relevant studies found} / \textit{Number of studies reviewed} (\textit{Total number of candidate studies}).''
+\item[\textbf{G}] Once \textbf{ONE} ``relevant'' study is coded, \textit{Random sampling} can be changed to \textit{Certainty sampling}, as FASTREAD suggests.
+\item[\textbf{H}] Fig. can be plotted by clicking the \textit{Plot} button or checking \textit{Auto Plot}. The generated figure can also be found in the \textit{src/static/image/} directory. The new figure will overwrite any old one.
+\item[\textbf{I}] Once finished, coded studies can be exported into a CSV file in the \textit{workspace/coded/} directory, in the format shown in Fig.~\ref{fig:output}.
+\end{enumerate}
+
+Note that the \textit{Restart} button (\textbf{J}) is only for testing and discards all codes.
+
+
+The only extra cost imposed by FASTREAD is training time. The total training time is $13.4$ seconds for Hall data set and $93.1$ seconds for Wahono data set. As demonstrated in Fig.~\ref{fig:runtime}, the training time is negligible comparing to review time.
+
+
+
+
+
+\section{Threats to Validity}
+\label{sect: Threats to Validity}
+
+There are several validity threats to the design of this study~\cite{feldt2010validity}. Any conclusions made from this work must be considered with the following issues in mind:
+
+\subsection{Conclusion validity}
+
+Conclusion validity focuses on the significance of the treatment. It does not threat this work since Scott-Knott analysis is applied to check the significance of our results.
+
+\subsection{Internal validity}
+
+Internal validity focuses on how sure we can be that the treatment
+actually caused the outcome. This does not threat this work since we simulated in strictly controlled environments as discussed in Section~\ref{subsect: Controlled Variables}.
+
+\subsection{Construct validity}
+
+Construct validity focuses on the relation between the theory
+behind the experiment and the observation. In this work, we evaluate different treatments with \textbf{recall} vs. \textbf{studies reviewed} curve as stated in Section~\ref{subsect: Performance Metrics}. It is believed to fit the objective of human-in-the-loop primary study most~\cite{tredennick2015,cormack2015autonomy,cormack2014evaluation}. Increasing the number of different measures may increase construct validity. Further investigation of such metrics is left for future work.
+
+\subsection{External validity}
+
+External validity concerns how well the conclusion can be applied outside. All the conclusions in this study are drawn from the experiments running on two software engineering SLR ``gold sets'' generated from Hall, Wahono et al. studies~\cite{hall2012systematic,wahono2015systematic}. Therefore, such conclusions may not be applicable to data sets of different scenarios, e.g., citation screening from evidence based medicine or TAR from e-discovery. Such bias threatens any classification experiment. The best any researcher can do is to document that bias then make available to the general research community all the materials used in a study (with the hope that other researchers will explore similar work on different data sets). Existing human-in-the-loop incremental learning techniques in citation screening have been criticized by by Olorisade et al. for being not replicable~\cite{olorisade2016critical}. To this end, we have published all our code at \textit{https://github.com/fastread/src} and all our data at \textit{https://doi.org/10.5281/zenodo.192506}.
+
+Both the ``gold sets'' used in this study extract data from only one data source. Exploration for multiple data sources is left for future work. 
+
+The conclusion of ``saving $90\%$ of the review effort while retrieving $90\%$ of the relevant studies'' depends on data sets. How the size and prevalence of initial candidate list may affect the result should be studied in the future.
+
+In the experiments, we assume that the human reviewer is always correct. In practice, this assumption cannot hold and problems such as disagreement between reviewers or concept drift (in which reviewers disagree with themselves as time passes) may occur.  As discussed
+below when we discuss {\em Future Work}, we intend to explore this matter in the near future.
+
+The comparisons in our experiment are based on the controlled variables listed in Section~\ref{subsect: Controlled Variables}. These controlled variables are suggested and justified in~\cite{krishna2016bigse} as the best practice and lay down the foundation of comparisons. The conclusion in Section~\ref{subsect: Results} may become unreliable if any of the controlled variables changes.
+
+
+
+\section{Conclusions and Future Works}
+\label{sect: Conclusion}
+
+Systematic literature reviews are the primary method for aggregating evidence in evidence-based software engineering. It is suggested for every researcher in software engineering to frequently conduct SLRs in~\cite{keele2007guidelines}. The hugest barrier to accomplish this is the cost. Usually an SLR would take months to finish and the conclusion drawn can be out of date in a few years. To tackle this barrier, this study focuses on primary study selection, one of the most difficult and time consuming steps in an SLR. Trying to reduce the effort required to exclude primary studies by applying machine learning methods. Two state-of-the-art human-in-the-loop incremental learning methods, one from evidence-based medicine and one from e-discovery, are refactored for an better method, FASTREAD, to support primary study selection. In our experiments, FASTREAD is capable to retrieve $90\%$ of the ``relevant'' studies by reviewing only $10\%$ of the candidate studies, which means a $90\%$ cost reduction.
+
+This work has lead to a simple software tool called FASTREAD, which
+we described above in Section~\ref{sect: tool}. We are currently advertising
+that tool on social media and hope that, very soon,
+we will be  able to report on
+case studies when other researchers use this tool. FASTREAD is
+an open source tool, published in Github, and we also hope
+that FASTREAD will be maintained and improved by numerous 
+researchers exploring this kind of technology. 
+
+This study has several limitations as described in Section~\ref{sect: Frequently Asked Questions} and \ref{sect: Threats to Validity}. We plan to address those limitations in future work. Specific problems and plans for the future include:
+
+\begin{itemize}
+
+\item
+{\em Conclusions are drawn from only two SLR data sets with only one data source, which may incur sampling bias.} Validate the results from multiple data sources, on different data sets, including data sets from evidence-based medicine and e-discovery.
+
+\item
+{\em Experiment results are evaluated by \textbf{Recall} vs. \textbf{studies reviewed} curve, which may incur evaluation bias.} Possibilities of other performance metrics will be explored in future work.
+
+\item
+{\em About $10\%$ to $20\%$ efforts are spent on random selection step and most of the variances are also introduced in this step.} To speed up the random selection step, external expert knowledge will be introduced while unsupervised learning methods such as VTM will also be considered in future work. 
+
+\item
+{\em Some of the magic parameters are arbitrarily chosen, which may affect the performance.} For example the margin threshold to determine whether SVM is already stable in uncertainty sampling, the minimum number of ``relevant'' examples to start aggressive undersampling, and when to stop the whole process. Parameter tuning might be helpful in resolving this issue.
+
+\item
+{\em The size and prevalence of data can affect performance of FASTREAD.} The analyse of such effects may in return help estimate the prevalence, therefore makes it possible to estimate the total number of ``relevant'' studies before FASTREAD stops.
+
+\item
+{\em Current scenario is restricted to having only one reviewer, which is impractical in practice.} Problems including how to assign review tasks to multiple reviewers and how to utilize reviewers with different cost and different capability will be explored in the future.
+
+\item
+{\em Current scenario assumes that reviewers never make mistakes, which is definitely not true in practice.} How to tackle concept drift (reviewers disagree with themselves) and how to settle disagreements (reviewers disagree with each other) would be valuable contributions for future work.
+
+\item
+{\em This study focuses only on primary study selection.} Assists on other steps of SLR such as searching, data extraction, and protocol development can also help reduce total effort of SLRs. The potential of combining VTM, snowballing, and other tools with FASTREAD needs to be explored as well.
+
+
+\end{itemize}
+
+With all the works in this study, a baseline result for human-in-the-loop primary study selection has been set up. There are still many concerns and potential improvements on FASTREAD, as discussed in Section~\ref{sect: Frequently Asked Questions}. We will keep working on the future work items and we believe that with all the materials in this work published, SE researchers can also explore further in SLR cost reduction. With our best hope, the effort required for conducting SLRs will eventually be reduced to days of work in the future and thus enable researchers to conduct SLRs much more frequently.
+
+ 
+% \bibliographystyle{plain}
+\bibliographystyle{spmpsci}
+\bibliography{sigproc} 
+
+
+
+
+\end{document}
+
+

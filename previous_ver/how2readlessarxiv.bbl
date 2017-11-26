@@ -1,0 +1,248 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{kitchenham2004evidence}
+B.~A. Kitchenham, T.~Dyba, M.~Jorgensen, Evidence-based software engineering,
+  in: Proceedings of the 26th international conference on software engineering,
+  IEEE Computer Society, 2004, pp. 273--281.
+
+\bibitem{1377125}
+T.~Dyba, B.~A. Kitchenham, M.~Jorgensen, Evidence-based software engineering
+  for practitioners, IEEE Software 22~(1) (2005) 58--65.
+\newblock \href {http://dx.doi.org/10.1109/MS.2005.6}
+  {\path{doi:10.1109/MS.2005.6}}.
+
+\bibitem{keele2007guidelines}
+S.~Keele, Guidelines for performing systematic literature reviews in software
+  engineering, in: Technical report, Ver. 2.3 EBSE Technical Report. EBSE,
+  2007.
+
+\bibitem{hassler2016identification}
+E.~Hassler, J.~C. Carver, D.~Hale, A.~Al-Zubidy, Identification of {SLR} tool
+  needs --- results of a community workshop, Information and Software
+  Technology 70 (2016) 122--129.
+
+\bibitem{hassler2014outcomes}
+E.~Hassler, J.~C. Carver, N.~A. Kraft, D.~Hale, Outcomes of a community
+  workshop to identify and rank barriers to the systematic literature review
+  process, in: Proceedings of the 18th International Conference on Evaluation
+  and Assessment in Software Engineering, ACM, 2014, p.~31.
+
+\bibitem{carver2013identifying}
+J.~C. Carver, E.~Hassler, E.~Hernandes, N.~A. Kraft, Identifying barriers to
+  the systematic literature review process, in: 2013 ACM/IEEE International
+  Symposium on Empirical Software Engineering and Measurement, IEEE, 2013, pp.
+  203--212.
+
+\bibitem{bowes2012slurp}
+D.~Bowes, T.~Hall, S.~Beecham, Slurp: a tool to help large complex systematic
+  literature reviews deliver valid and rigorous results, in: Proceedings of the
+  2nd international workshop on Evidential assessment of software technologies,
+  ACM, 2012, pp. 33--36.
+
+\bibitem{bezerra2009systematic}
+Y.~M. Bezerra, T.~A.~B. Pereira, G.~E. da~Silveira, A systematic review of
+  software product lines applied to mobile middleware, in: Information
+  Technology: New Generations, 2009. ITNG'09. Sixth International Conference
+  on, IEEE, 2009, pp. 1024--1029.
+
+\bibitem{wallace2010semi}
+B.~C. Wallace, T.~A. Trikalinos, J.~Lau, C.~Brodley, C.~H. Schmid,
+  Semi-automated screening of biomedical citations for systematic reviews, BMC
+  bioinformatics 11~(1) (2010) 1.
+
+\bibitem{wallace2010active}
+B.~C. Wallace, K.~Small, C.~E. Brodley, T.~A. Trikalinos, Active learning for
+  biomedical citation screening, in: Proceedings of the 16th ACM SIGKDD
+  international conference on Knowledge discovery and data mining, ACM, 2010,
+  pp. 173--182.
+
+\bibitem{cormack2014evaluation}
+G.~V. Cormack, M.~R. Grossman, Evaluation of machine-learning protocols for
+  technology-assisted review in electronic discovery, in: Proceedings of the
+  37th international ACM SIGIR conference on Research \& development in
+  information retrieval, ACM, 2014, pp. 153--162.
+
+\bibitem{cormack2015autonomy}
+G.~V. Cormack, M.~R. Grossman, Autonomy and reliability of continuous active
+  learning for technology-assisted review, arXiv preprint arXiv:1504.06868.
+
+\bibitem{wahono2015systematic}
+R.~S. Wahono, A systematic literature review of software defect prediction:
+  research trends, datasets, methods and frameworks, Journal of Software
+  Engineering 1~(1) (2015) 1--16.
+
+\bibitem{hall2012systematic}
+T.~Hall, S.~Beecham, D.~Bowes, D.~Gray, S.~Counsell, A systematic literature
+  review on fault prediction performance in software engineering, IEEE
+  Transactions on Software Engineering 38~(6) (2012) 1276--1304.
+
+\bibitem{malhotra2015systematic}
+R.~Malhotra, A systematic review of machine learning techniques for software
+  fault prediction, Applied Soft Computing 27 (2015) 504--518.
+
+\bibitem{radjenovic2013software}
+D.~Radjenovi{\'c}, M.~Heri{\v{c}}ko, R.~Torkar, A.~{\v{Z}}ivkovi{\v{c}},
+  Software fault prediction metrics: A systematic literature review,
+  Information and Software Technology 55~(8) (2013) 1397--1418.
+
+\bibitem{unterkalmsteiner2012evaluation}
+M.~Unterkalmsteiner, T.~Gorschek, A.~M. Islam, C.~K. Cheng, R.~B. Permadi,
+  R.~Feldt, Evaluation and measurement of software process improvement—a
+  systematic literature review, IEEE Transactions on Software Engineering
+  38~(2) (2012) 398--424.
+
+\bibitem{malheiros2007visual}
+V.~Malheiros, E.~Hohn, R.~Pinho, M.~Mendonca, J.~C. Maldonado, A visual text
+  mining approach for systematic reviews, in: First International Symposium on
+  Empirical Software Engineering and Measurement (ESEM 2007), IEEE, 2007, pp.
+  245--254.
+
+\bibitem{marshall2015tools}
+C.~Marshall, P.~Brereton, B.~Kitchenham, Tools to support systematic reviews in
+  software engineering: A cross-domain survey using semi-structured interviews,
+  in: Proceedings of the 19th International Conference on Evaluation and
+  Assessment in Software Engineering, ACM, 2015, p.~26.
+
+\bibitem{marshall2014tools}
+C.~Marshall, P.~Brereton, B.~Kitchenham, Tools to support systematic reviews in
+  software engineering: A feature analysis, in: Proceedings of the 18th
+  International Conference on Evaluation and Assessment in Software
+  Engineering, EASE '14, ACM, 2014, pp. 13:1--13:10.
+
+\bibitem{marshall2013tools}
+C.~Marshall, P.~Brereton, Tools to support systematic literature reviews in
+  software engineering: A mapping study, in: 2013 ACM/IEEE International
+  Symposium on Empirical Software Engineering and Measurement, IEEE, 2013, pp.
+  296--299.
+
+\bibitem{Molleri:2015:SWA:2745802.2745825}
+J.~S. Moll{\'e}ri, F.~B.~V. Benitti, Sesra: A web-based automated tool to
+  support the systematic literature review process, in: Proceedings of the 19th
+  International Conference on Evaluation and Assessment in Software
+  Engineering, EASE '15, ACM, New York, NY, USA, 2015, pp. 24:1--24:6.
+\newblock \href {http://dx.doi.org/10.1145/2745802.2745825}
+  {\path{doi:10.1145/2745802.2745825}}.
+
+\bibitem{fernandez2010slr}
+A.~M. Fern{\'a}ndez-S{\'a}ez, M.~G. Bocco, F.~P. Romero, {SLR-Tool}: A tool for
+  performing systematic literature reviews., in: ICSOFT (2), 2010, pp.
+  157--166.
+
+\bibitem{hernandes2012using}
+E.~Hernandes, A.~Zamboni, S.~Fabbri, A.~D. Thommazo, Using gqm and tam to
+  evaluate start-a tool that supports systematic review, CLEI Electronic
+  Journal 15~(1) (2012) 3--3.
+
+\bibitem{felizardo2010approach}
+K.~R. Felizardo, E.~Y. Nakagawa, D.~Feitosa, R.~Minghim, J.~C. Maldonado, An
+  approach based on visual text mining to support categorization and
+  classification in the systematic mapping, in: Proc. of EASE, Vol.~10, 2010,
+  pp. 1--10.
+
+\bibitem{felizardo2012visual}
+K.~R. Felizardo, G.~F. Andery, F.~V. Paulovich, R.~Minghim, J.~C. Maldonado, A
+  visual analysis approach to validate the selection review of primary studies
+  in systematic reviews, Information and Software Technology 54~(10) (2012)
+  1079--1091.
+
+\bibitem{Felizardo:2014:VAA:2601248.2601252}
+K.~R. Felizardo, E.~Y. Nakagawa, S.~G. MacDonell, J.~C. Maldonado, A visual
+  analysis approach to update systematic reviews, in: Proceedings of the 18th
+  International Conference on Evaluation and Assessment in Software
+  Engineering, EASE '14, ACM, New York, NY, USA, 2014, pp. 4:1--4:10.
+\newblock \href {http://dx.doi.org/10.1145/2601248.2601252}
+  {\path{doi:10.1145/2601248.2601252}}.
+
+\bibitem{zhang2011empirical}
+H.~Zhang, M.~A. Babar, X.~Bai, J.~Li, L.~Huang, An empirical assessment of a
+  systematic search process for systematic reviews, in: Evaluation \&
+  Assessment in Software Engineering (EASE 2011), 15th Annual Conference on,
+  IET, 2011, pp. 56--65.
+
+\bibitem{jalali2012systematic}
+S.~Jalali, C.~Wohlin, Systematic literature studies: database searches vs.
+  backward snowballing, in: Proceedings of the ACM-IEEE international symposium
+  on Empirical software engineering and measurement, ACM, 2012, pp. 29--38.
+
+\bibitem{wallace2011should}
+B.~C. Wallace, K.~Small, C.~E. Brodley, T.~A. Trikalinos, Who should label
+  what? instance allocation in multiple expert active learning., in: SDM, SIAM,
+  2011, pp. 176--187.
+
+\bibitem{wallace2012deploying}
+B.~C. Wallace, K.~Small, C.~E. Brodley, J.~Lau, T.~A. Trikalinos, Deploying an
+  interactive machine learning system in an evidence-based practice center:
+  abstrackr, in: Proceedings of the 2nd ACM SIGHIT International Health
+  Informatics Symposium, ACM, 2012, pp. 819--824.
+
+\bibitem{wallace2013active}
+B.~C. Wallace, I.~J. Dahabreh, K.~H. Moran, C.~E. Brodley, T.~A. Trikalinos,
+  Active literature discovery for scoping evidence reviews: How many needles
+  are there, in: KDD workshop on data mining for healthcare (KDD-DMH), 2013.
+
+\bibitem{wallace2013modernizing}
+B.~C. Wallace, I.~J. Dahabreh, C.~H. Schmid, J.~Lau, T.~A. Trikalinos,
+  Modernizing the systematic review process to inform comparative
+  effectiveness: tools and methods, Journal of comparative effectiveness
+  research 2~(3) (2013) 273--282.
+
+\bibitem{nguyen2015combining}
+A.~T. Nguyen, B.~C. Wallace, M.~Lease, Combining crowd and expert labels using
+  decision theoretic active learning, in: Third AAAI Conference on Human
+  Computation and Crowdsourcing, 2015.
+
+\bibitem{cohen2006reducing}
+A.~M. Cohen, W.~R. Hersh, K.~Peterson, P.-Y. Yen, Reducing workload in
+  systematic review preparation using automated citation classification,
+  Journal of the American Medical Informatics Association 13~(2) (2006)
+  206--219.
+
+\bibitem{adeva2014automatic}
+J.~G. Adeva, J.~P. Atxa, M.~U. Carrillo, E.~A. Zengotitabengoa, Automatic text
+  classification to support systematic reviews in medicine, Expert Systems with
+  Applications 41~(4) (2014) 1498--1508.
+
+\bibitem{krishna2016bigse}
+R.~Krishna, Z.~Yu, A.~Agrawal, M.~Dominguez, D.~Wolf, The bigse project:
+  lessons learned from validating industrial text mining, in: Proceedings of
+  the 2nd International Workshop on BIG Data Software Engineering, ACM, 2016,
+  pp. 65--71.
+
+\bibitem{grossman2013}
+M.~R. Grossman, G.~V. Cormack, The grossman-cormack glossary of
+  technology-assisted review with foreword by john m. facciola, u.s. magistrate
+  judge., Federal Courts Law Review 7~(1) (2013) 1--34.
+
+\bibitem{leasesystematic}
+M.~Lease, G.~V. Cormack, A.~T. Nguyen, T.~A. TrikalinosV, B.~C. Wallace,
+  Systematic review is e-discovery in doctor’s clothing.
+
+\bibitem{settles2012active}
+B.~Settles, Active learning, Synthesis Lectures on Artificial Intelligence and
+  Machine Learning 6~(1) (2012) 1--114.
+
+\bibitem{cortes1995support}
+C.~Cortes, V.~Vapnik, Support-vector networks, Machine learning 20~(3) (1995)
+  273--297.
+
+\bibitem{joachims2006training}
+T.~Joachims, Training linear svms in linear time, in: Proceedings of the 12th
+  ACM SIGKDD international conference on Knowledge discovery and data mining,
+  ACM, 2006, pp. 217--226.
+
+\bibitem{settles2010active}
+B.~Settles, Active learning literature survey, University of Wisconsin, Madison
+  52~(55-66) (2010) 11.
+
+\bibitem{tredennick2015}
+J.~Tredennick, TAR for Smart People, Catalyst, 2015.
+
+\bibitem{isotalo2001basics}
+J.~Isotalo, Basics of statistics, Finland: University of Tampere.
+
+\end{thebibliography}
