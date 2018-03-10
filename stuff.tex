@@ -1,0 +1,109 @@
+
+This special section offers extensions to the three best papers
+from the PROMISE 2011 conference on Predictive Modeling
+(co-located with the 2011 Empirical Software Engineering and
+Measurement conference) held in Banff Canada. The hard work involved
+with creating a special section falls mostly on reviewers and
+I thank the reviewers of this special section for all their labor on
+this task.
+
+This special section can be read as a ‘‘report card’’ on the 8-year
+old PROMISE project. The project was co-founded in 2004 by Jelber
+Sayyad and myself with the aim to add a new level of rigor to
+machine learning work in software engineering. The concept was
+simple: if a researcher writes a paper, then let them present that
+paper along with the data that the paper was based on.
+
+Since that time, the PROMISE repository has grown to 100+ data
+sets and is being used around the world by numerous research
+groups. A tacit assumption in all that work was that sooner or later,
+we should reach some critical mass in the size of our data sets, then
+uncover general principles of software engineering. The papers in
+this special section show just how wrong that assumption can be.
+
+In several recent studies [1–4] with readily-available data from
+SE repositories, numerous authors report the same locality effect in
+SE; i.e. general models outperformed by specialized models localized
+to particular parts of the data. The implications of this staggering.
+Put simply: what works best there may not work best here.
+That is, any model that is generally true across many projects
+may not be useful for any particular project.
+
+This is an exciting conclusion that changes the nature of empirical
+SE research. Rather that look for the best models, we should
+instead seek the best methods for building the best local models.
+The papers in this special section all take different approaches to
+this task of best methods for building best local models.
+
+In Predicting Failure-Proneness in an Evolving Software Product
+Line, Sandeep Krishnan, Chris Strasburg, Robyn R. Lutz, Katerina
+Goseva-Popstojanova, and Karin S. Dorman show that models
+may not hold globally across product lines. While learner
+performance improves significantly for two of the three of their
+case-study datasets, it does not for prediction of post-release failure-prone
+files using only pre-release change data. This suggests
+that it may be difficult to detect failure-prone files in the evolving
+product line. At least in part, this may be due to the continuous
+change, even for commonalities and high-reuse variation
+components.
+
+The Krishnan et al. paper related to defect prediction. Another
+paper on another topic (effort prediction) accepts locality in SE
+and discusses methods to handle this issue. In Analyzing and
+Handling Local Bias for Calibrating Parametric Cost Estimation Models
+Ye Yang, Zhimin He, Ke Mao, Qi Li, Vu Nguyen, Barry Boehm and
+Ricardo Valerdi show that local bias in cross-company data does
+harm model calibration and adds noisy factors to model maintenance.
+They propose a ‘‘local bias measure’’ to quantify the degree
+of local bias associated with a cross-company dataset, and assess
+its influence on parametric model performance. The measure can
+be applied to trade-off and mitigate potential risk of significant local
+bias (a factor which, if uncontrolled, limits the usability of
+cross-company data for general parametric model calibration and
+maintenance).
+
+Our final paper Ensembles and Locality: Insight on Improving Software
+Effort Estimation by Leandro Minku and Xin Yao discusses
+ensemble methods for building local models using a committee
+of artificially generated experts (the ensemble). A key issue with
+that approach is how to build the committee members. Minku
+and Yao recommend bagging ensembles of regression trees these
+are frequently among the best approaches for each data set and
+rarely performing considerably worse than the best approach for
+any data set. They are hence recommended for organizations that
+have no resources to perform experiments to choose their own
+model. And they add the important caveat: even though regression
+trees have been shown to be more reliable, other approaches such
+as kMeans and k-Nearest Neighbors can also perform well, in particular
+for more heterogeneous data sets.
+In summary, to repeat and stress the main message of this editorial,
+the message of these papers is that it is time to stop looking
+for some ‘‘holy grail’’ of a unifying theory or model of software
+engineering. Constructing software is a highly specialized tasks
+where specific people build specific products for specific reasons.
+It is therefore to be expected that what works here does not work
+there. Clearly, what is required is a new kind of data science for
+software engineering, one that is less focused on a model’s external
+validity but is most focused on developing and validating best local
+models, in a cost-effective manner.
+References
+[1] N. Bettenburg, M. Nagappan, A. Hassan, Think locally, act globally: Improving
+defect and effort prediction models, in: 9th IEEE Working Conference on Mining
+Software Repositories (MSR), June 2012, pp. 60–69.
+[2] T. Menzies, A. Butcher, D. Cok, A. Marcus, L. Layman, F. Shull, B. Turhan, T.
+Zimmermann, Local vs. global lessons for defect prediction and
+effort estimation, IEEE Transactions on Software Engineering 99 (2012) 1.
+PrePrints.
+[3] T. Menzies, A. Butcher, A. Marcus, T. Zimmermann, D. Cok, Local vs. global
+models for effort estimation and defect prediction, in: 26th IEEE/ACM
+International Conference on Automated Software Engineering (ASE), 6–10
+November 2011, pp. 343–351.
+
+[4] D. Posnett, V. Filkov, P. Devanbu, Ecological inference in empirical software
+engineering, in: 26th IEEE/ACM International Conference on Automated
+Software Engineering (ASE), 6–10 November 2011, pp. 362–371.
+
+menzieslocal
+menzies2011local
+bettenburg2012think
+posnett2011ecological

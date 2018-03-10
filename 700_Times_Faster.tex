@@ -13,6 +13,7 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage[most]{tcolorbox}
 
+
 \usepackage{picture}
 \newcommand{\quart}[4]{\begin{picture}(100,6)%1
 {\color{black}\put(#3,3){\circle*{4}}\put(#1,3){\line(1,0){#2}}}\end{picture}}
@@ -77,7 +78,7 @@ fill=Gray!40]
     showspaces=false,
     showstringspaces=false,
     keywordstyle=\bfseries\sffamily,
-    emph={ m, r, k, frontier, cf, f, g, n, tData, nrefs, cMax, inertia, gaps,trainData, testData, Word2Vec_model, trainX, trainY, cluster, svm_models, totalDlusterY, totalPredicted}, emphstyle=\bfseries\color{blue!50!black},
+    emph={ m, r, k, frontier, cf, f, g, n, tData, nrefs, cMax, inertia, gaps,trainData, testData, Word2Vec_model, trainX, trainY, cluster, svm_models, totalDlusterY,predictedC, r, threads, predicted, data, predict,cluster_model , classification_model}, emphstyle=\bfseries\color{blue!50!black},
     stringstyle=\color{green!50!black},
     commentstyle=\color{red!50!black}\it,
     numbers=left,
@@ -103,10 +104,9 @@ fill=Gray!40]
 \acmISBN{123-4567-24-567/08/06}
 
 %Conference
-\acmConference[WOODSTOCK'97]{ACM Woodstock conference}{July 1997}{El
-  Paso, Texas USA} 
-\acmYear{1997}
-\copyrightyear{2016}
+\acmConference[MSR'18]{Mining Software Repositories}{May 2018}{Gothenburg, Sweden} 
+\acmYear{2018}
+\copyrightyear{2018}
 
 
 \acmArticle{4}
@@ -117,26 +117,42 @@ fill=Gray!40]
 
 
 \begin{document}
-\title{ 900 Times Faster Than Deep Learning} 
+\title{ 500+ Times Faster Than Deep Learning} 
 \subtitle{(A Case Study Exploring Faster   Methods for Text Mining StackOverflow)}
 
 
-\author{Suvodeep Majumder, Nikhila Balaji, Katie Brey, Tim Menzies}  
+\author{Suvodeep Majumder, Nikhila Balaji, Katie Brey, Wei Fu, Tim Menzies}  
 \affiliation{%
   \institution{Computer Science, NC State, USA}
 }
-\email{smajumd3,nbalaji,kebrey@ncsu.edu; tim@menzies.us}
+\email{smajumd3,nbalaji,kebrey, wfu@ncsu.edu; tim@menzies.us}
 
- 
- \pagestyle{plain}
 
 % The default list of authors is too long for headers.
 \renewcommand{\shortauthors}{S. Majumder et al.}
 
 
+% \author{Author list blinded for review}  
+% \affiliation{%
+%   \institution{Institution list blinded for review}
+% }
+% %\email{Email ~list blinded for review}
+% \renewcommand{\shortauthors}{Anonymous}
+
+ 
 \begin{abstract}
-Deep learning is a representation-learning methods that composes simple, but non-linear modules, to transform  representation at one level (starting with the raw input) into a representation at a higher, slightly more abstract level. Compared to the conventional machine learning algorithms, deep learning methods are very good at exploring high-dimensional data and is becoming widely used in many areas of software engineering such as natural language processing, computer vision, image processing, text mining etc.. However, deep learners utilizes extensive computational power and can take a very long time to train. This makes it difficult to properly validate results, as well as for others to repeat results. For the problem of finding relatedness of Stack Overflow posts, it has been shown that a tuned SVM performs similarly to a deep learner, but is significantly faster to train. We extend this work to investigate the impact of local models. We first cluster the dataset and train tuned simple learners on each cluster in parallel. We show that this approach also performs similarly to the convolutional neural network, but is almost 965 times faster. This has significant implications for using global versus local models in  text mining problems-- such local models
-can     great simplify the learning task   without  negatively  impacting   model performance.
+%keep in under 200 words
+ Deep learning methods are 
+useful for  high-dimensional data and are becoming widely used in many areas of software engineering. 
+Deep learners utilizes extensive computational power and can take a  long time to train-- making it difficult to widely validate and repeat and improve their results.
+Further, they are not the best solution in all domains. For example, recent results
+show that for finding related   Stack Overflow posts, a tuned SVM performs similarly to a deep learner, but is significantly faster to train. 
+
+This paper extends that recent result by   clustering the dataset, then    tuning every learners within each cluster. This approach is over  500 times faster than  deep learning (and over 900 times faster if we use all the cores on a standard laptop computer). Significantly, this faster approach generates classifiers   nearly as good (within 2\% F1 Score) as the much slower deep learning method.
+Hence we recommend this faster methods since it is much easier to reproduce and utilizes far fewer CPU resources. 
+
+More generally, we recommend that before researchers release research results, that they compare their supposedly sophisticated methods against simpler alternatives
+(e.g applying simpler learners to build local models).
 \end{abstract}
 
 %
@@ -144,206 +160,430 @@ can     great simplify the learning task   without  negatively  impacting   mode
 % http://dl.acm.org/ccs.cfm
 % Please copy and paste the code instead of the example below. 
 %
-\begin{CCSXML}
-<ccs2012>
- <concept>
-  <concept_id>10010520.10010553.10010562</concept_id>
-  <concept_desc>Computer systems organization~Embedded systems</concept_desc>
-  <concept_significance>500</concept_significance>
- </concept>
- <concept>
-  <concept_id>10010520.10010575.10010755</concept_id>
-  <concept_desc>Computer systems organization~Redundancy</concept_desc>
-  <concept_significance>300</concept_significance>
- </concept>
- <concept>
-  <concept_id>10010520.10010553.10010554</concept_id>
-  <concept_desc>Computer systems organization~Robotics</concept_desc>
-  <concept_significance>100</concept_significance>
- </concept>
- <concept>
-  <concept_id>10003033.10003083.10003095</concept_id>
-  <concept_desc>Networks~Network reliability</concept_desc>
-  <concept_significance>100</concept_significance>
- </concept>
-</ccs2012>  
-\end{CCSXML}
+% \begin{CCSXML}
+% <ccs2012>
+%  <concept>
+%   <concept_id>10010520.10010553.10010562</concept_id>
+%   <concept_desc>Computer systems organization~Embedded systems</concept_desc>
+%   <concept_significance>500</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10010520.10010575.10010755</concept_id>
+%   <concept_desc>Computer systems organization~Redundancy</concept_desc>
+%   <concept_significance>300</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10010520.10010553.10010554</concept_id>
+%   <concept_desc>Computer systems organization~Robotics</concept_desc>
+%   <concept_significance>100</concept_significance>
+%  </concept>
+%  <concept>
+%   <concept_id>10003033.10003083.10003095</concept_id>
+%   <concept_desc>Networks~Network reliability</concept_desc>
+%   <concept_significance>100</concept_significance>
+%  </concept>
+% </ccs2012>  
+% \end{CCSXML}
 
-\ccsdesc[500]{Computer systems organization~Embedded systems}
-\ccsdesc[300]{Computer systems organization~Redundancy}
-\ccsdesc{Computer systems organization~Robotics}
-\ccsdesc[100]{Networks~Network reliability}
+% \ccsdesc[500]{Computer systems organization~Embedded systems}
+% \ccsdesc[300]{Computer systems organization~Redundancy}
+% \ccsdesc{Computer systems organization~Robotics}
+% \ccsdesc[100]{Networks~Network reliability}
 
 
-\keywords{Deep learning, parameter tuning, DE, KNN, local versus global, k-means, SVM, CNN}
+\keywords{Deep learning, parameter tuning, DE, KNN, local versus global, KMeans, SVM, CNN}
 
 
 \maketitle
 
-\section{Introduction}
+ \section{Introduction}
     \label{sect:intro}
-    Using deep learners like convolutional neural networks (CNN) has been a popular choice for text mining, since deep learning works well with high dimensional data [11]. Deep learners have been used to achieve impressive performance, but they are very expensive in terms of time and demand high computational resources.
-    
-    In this paper we build off of work done by Xu et al. ~\cite{xu2016predicting} and Fu et al. ~\cite{fu2017easy} on finding the semantic relatedness of Stack Overflow posts. A single stackoverflow question along with its complete answer is considered a knowledge unit (KU). If any two KUs are semantically related, they are considered as linkable knowledge. Otherwise, they are considered isolated. Linkable KUs can be broken down into three classes depending on how related they are scored. Xu first proposed the use of a CNN ~\cite{hubel1959receptive}, a specific kind of deep learner, that took 14 hours to train. Fu's work showed that a DE-tuned SVM performs similarly for this dataset, but trains 84x faster. One of the points Fu was trying to show was that the computational cost, resources and time that a state of the art learner demands can be avoided and similar performance results can be obtained if we replace the state of the art learner with a simple standard learner like SVM and tune its parameters. 
-    
-    In this paper, we present our work, where we focus on the same idea that faster results can be obtained with standard learners - but we extend it further by building multiple local models and tries to show that local model can be built which has similar result, same as state of the art learners, but can be trained fast. We propose to first cluster the data, and then run the tuned learners on each cluster in parallel. We tried this for SVM (used by both Xu and Fu) and KNN, as the later is also widely used method~\cite{bijalwan2014knn,wang2012improved} for text classification and has produced promising results in text classification field. These learners have been used in combination with differential evolution as seen below in table~\ref{tab:learners}. We compared this with two standard learners, KNN and SVM, and tuned versions of the same learners - a total of 4 more combinations. 
-    
-    Our study asks:
-    \begin{itemize}
-        \item 
-            \textbf{RQ1}:  {\em Can we reproduce Fu's results for tuning SVM with differential evolution (DE)?} 
-            \begin{lesson}
-                Yes, we found similar results.
-            \end{lesson}
-        \item 
-            \textbf{RQ2}: {\em   How do the local models compare with global models in both tuned and untuned versions in terms model training time?} 
-            \begin{lesson}
-                Local models perform comparably to their global model counterparts, but are significantly faster in model training time.
-            \end{lesson}
-        \item 
-            \textbf{RQ3}: {\em   How does the performance of local models compare with global models and state-of-the-art Deep Learner when used with SVM and KNN?} 
-            \begin{lesson}  
-                Local models performance is similar to their global counterpart and state of the art Deep Learner.
-            \end{lesson}
-    \end{itemize}
-  To answer these questions we:
-    \begin{itemize}
-        \item Review and use different learning models as mentioned in Table~\ref{tab:learners} for text mining purpose.
-        \item Explore hyper-parameter tuning specifically Differential Evolution(DE) in these learner to fine tune the learners.
-        \item Use clustering to divide the data into small cluster and then apply those algorithms for each cluster for prediction.
-        \item Explore the local models and their potential both in-term of model performance and model training time.
-        \item Evaluate and Compare these models in both training time and performance.
-        \item Discovering that local models performs significantly better in-term of training time and almost similar in performance.
-    \end{itemize}
-    Based on these experiments and discoveries, our contribution and outcome from the paper are:
-    \begin{itemize}
-        \item An cautionary note for the MSR community
-        that, sometimes, there is little value-added from
-        over-elaborated bleeding edge methods. Rather simple tools  can be used to achieve similar or even better results.
-        \item A case study, which shows a simple method with some tricks like in this paper a simple SVM with DE and local models can performs as good some of the state of the art models but with faster training time.
-        \item A demonstration of potential way to reduce training time by using local models by clustering data and classifier on each cluster. Thus, offering local models along with a cluster new model as a technique to SE community to create faster models with similar performance as state of the art learners.
-        \item Potentially present a faster method of text data classification than deep learning.
-        \item Access to the reproduction package - which can be used to reproduce, improve or refute our results\footnote{URL blinded for review.}.
-
-    \end{itemize}
-    \begin{table}[!t]
+   Recently, deep learning methods like   convolutional neural networks (CNN) have
+   become a   popular choice for text mining in SE. Such   deep learning works well with high dimensional data~\cite{mou2016convolutional} but are very expensive in terms of time and required CPU.
+  
+  
+  \begin{table}[!b]
         \centering
         \small
-        \begin{tabular}{c|c|p{4cm}}
+        \begin{tabular}{c|c|p{4.5cm}}
             \rowcolor{gray} \textcolor{white}{\textbf{Type}} & \textcolor{white}{\textbf{Abbreviation}} & \textcolor{white}{\textbf{Learner Description}}\\
             \hline
             G & SVM & Support Vector Machine \\ 
-            \rowcolor{lightgray} G & KNN & K\-nearest Neighbors \\ 
-            G & DE\_KNN & K\-nearest Neighbors Tuned using differential evolution \\ 
-            \rowcolor{lightgray} G & DE\_SVM & Support Vector Machines Tuned using differential evolution \\ 
-            L & K\-Means\_KNN & Cluster + multiple KNNs \\ 
-            \rowcolor{lightgray} L & K\-Means\_DE\_KNN & Cluster + multiple KNNs tuned with DE \\ 
-            L & K\-Menas\_SVM & Cluster + multiple SVMs \\ 
-            \rowcolor{lightgray} L & K\-Means\_DE\_SVM & Cluster + multiple SVMs tuned with DE \\ 
-        \end{tabular}
-        \caption{List of learner combinations in experiment}
+            \rowcolor{lightgray} G & KNN & K-nearest Neighbors \\ 
+            G & DE\_KNN & K-nearest Neighbors tuned using differential evolution (DE)\\ 
+            \rowcolor{lightgray} G & DE\_SVM & Support Vector Machines Tuned using differential evolution \\
+            G & CNN & Convolution Neural Network \\
+            \rowcolor{lightgray}L & KMeans\_KNN & Cluster + multiple KNNs \\ 
+            L & KMeans\_DE\_KNN & Cluster + multiple KNNs tuned via DE \\ 
+            \rowcolor{lightgray}L & KMenas\_SVM & Cluster + multiple SVMs \\ 
+            L & KMeans\_DE\_SVM & Cluster multiple SVMs tuned via DE \\ 
+        \end{tabular}\vspace{3mm}
+        \caption{Combinations of learning algorithms.
+        L= ``local models''  and G= ``global models'' which denotes learning from clusters or all
+        of the data (respectively).}
         \label{tab:learners}
     \end{table}
+    
+    
+   In response to the computational problems of
+   deep learners, researchers have tried alternate methods.
+   For example,
+   Fu et al. ~\cite{fu2017easy} recently revisited
+   a study by Xu et al. ~\cite{xu2016predicting}   on finding the semantic relatedness of Stack Overflow posts.
+   In that study, a single Stack Overflow question along with its complete answer was called a ``knowledge unit'' (KU). If any two KUs are semantically related, they are considered as {\em linkable} knowledge. Otherwise, they are considered {\em isolated}.   When Xu et al. applied CNN ~\cite{hubel1959receptive} (a specific kind of deep learner), that took 14 hours to train. Fu et al.
+   showed
+   that this computational cost was avoidable
+   by replacing a more complex learner (CNN)
+   with a simpler technique augmented by some
+   hyperparameter optimization.
+   Specifically, Fu et al. shows that   support vector machine (SVM) tuned via differential evolution (DE) could  perform as well as CNN, while
+   training   84 times  faster.  
+    
+   This paper further extends the Fu et al. Using very simple widely used data mining method (KMeans), we can train even faster that Fu et al. and 
+   500 times faster than  deep learning (and over 900 times faster if we use all the cores on a standard laptop computer).
+   The core to our approach is  (1)~{\em building multiple local models} then (2)~{\em tuning per local model}.
+This paper evaluates this divide and conquer approach by:
+    \begin{enumerate}
+        \item  Exploring the Xu et al. task using SVM and K-nearest-neighbor (KNN) classifiers;
+        \item Repeating step 1 using  hyperparameter tuning--
+        specifically,  differential Evolution (DE)--
+        to select control parameters for those learners;
+        \item Repeats steps 1 and 2 using 
+        {\em local modeling};
+        i.e. clustering the data then apply tuning and learning to each cluster; 
+      
+        \item Evaluating these local models in terms of both their training time and performance
+    \end{enumerate}
+ Table~\ref{tab:learners} lists all the learners explored here.
+ 
+  \newpage\noindent
+  This approach lets us ask and answer the following questions:
+    \begin{itemize}
+        \item 
+            \textbf{RQ1}:  Can we reproduce Fu et al.'s results for tuning SVM with differential evolution (DE)?
+            \begin{lesson}
+                Our DE with SVM perform no worse than Fu et al.
+            \end{lesson}
+        \item 
+            \textbf{RQ2}:    How do the local models compare with global models in both tuned and untuned versions in terms model training time?
+            \begin{lesson}
+                Local models perform comparably to their global model counterparts, but are 570 times faster in model training time.
+            \end{lesson}
+            (To be precise,  that   570 figure comes from running on a single core. If we distribute the execution cross the eight cores of a standard laptop computer, our training times
+            become 965 times faster.)
+        \item 
+            \textbf{RQ3}:   How does the performance of local models compare with global models and state-of-the-art deep learner when used with SVM and KNN?
+            \begin{lesson}  
+                Local models performance very nearly as well (within  2\% F1 Score) as their global counterpart and the state-of-the-art deep Learner.
+            \end{lesson}
+    \end{itemize}
+    Based on these experiments and discoveries, our contribution and outcome from the paper are:
+    \begin{itemize}
+     \item  A dramatically faster solution to the Stack Overflow text mining task first
+     presented by Xu et al. This  new method
+     runs three orders of magnitude faster than prior work.
+        \item Support for ``not everything needs deep learning'';  i.e. sometimes, applying
+        deep learning to a problem may not be the
+        best approach.
+        \item Support for  a simplicity-first approach; i.e.
+         simple method like KMeans\_DE\_SVM   can performs as good some of the state of the art models but with a (much) faster training time.
+        \item Support for local modeling. Such local
+        models   can significantly reduce training time by  clustering data then restricting learning to  on each cluster.  
+        \item  A reproduction package - which can be used to reproduce, improve or refute our results\footnote{URL blinded for review.}.
+
+    \end{itemize}
     The rest of the paper is organized into the following sections 
     Section~\ref{sect: Background and Motivation} provides background information  that directly relates to our research questions, in addition to laying out the motivation behind our work. In 
     Section~\ref{sect: Experimental Design} a detailed description of our experimental setup and data, along with our performance criteria for evaluation is presented. It is followed by 
     Section~\ref{sect:Result} the results of the experiments and answers to our research questions are detailed.
     Section~\ref{sect:THREATS TO VALIDITY} discusses threats to validity. Finally 
     Section~\ref{sect:CONCLUSION} concludes the paper with implications and scope for future work.
-\section{Background and Motivation}
+\section{Background  }
 \label{sect: Background and Motivation}
-    In this section we discuss about what motivated us to walk in this path of fast models and what are the different issues we face with slow learners along with the different techniques and models as mentioned in Table~\ref{tab:learners}, that has been incorporated in our research, that has enabled us to achieve our goal.
+   
     
-    \subsection{Why We Need Faster Models?}
-    \label{sssec:Why We Need faster Models?}
-    Deep Learning is a very new and exciting topic and is being applied to many areas such as image processing, natural language processing, genomics etc. Like Wan and Wang discusses in the paper~\cite{wan2014deep} how deep learning tries to resolve the "Semantic Gap" issue in content based image retrieval process~\cite{smeulders2000content} or deep learning being used to predict DNA-RNA binding proteins~\cite{alipanahi2015predicting} which helps to solve problems faced by normal experiments.Thus we can see the benefits of applying the technique over there because of their complex natures. Also, the results are quite intriguing in those areas.
+\subsection{Motivation}
+\label{sssec:Why We Need faster Models?}
     
-    Deep learning has also established its presence in software engineering and text mining community and we can see lots of research and work~\cite{choetkiertikul2016deep,mou2016convolutional,white2016deep,white2015toward,yuan2014droid,yang2015deep} being done using deep learning. 
-    
-    But deep learning being a computationally expensive method, it often takes hours to weeks to train the models. This makes cross validation and stability of model check very expensive if not impossible. 
 
-    Software and data analytics is extensively used in software community to discover and predict different aspects in different phases~\cite{ghezzi2002fundamentals} of software development lifecycle like how long it will take to integrate new code~\cite{herbsleb1999splitting}, which portion of code is expected to have most bugs~\cite{menzies2007data}, which team has the probability of fixing the bug best etc. These analyses sometimes needed to be computed on very large data sets and multiple time~\cite{fenton2007predicting} over the development cycle or when ever we discover some changes in the system that may affect out analysis. 
+    Why obsesses on making software analytics faster? Why not just  buy more cloud CPU time?
+    Such a ``just throw money at it'' approach might not impress
+    researchers like Fisher et al.~\cite{fisher2012interactions} who define ``software analytics'' as a work flow that distills large quantities of low-value
+    data down to smaller sets of higher value data. Due to the complexities and computational cost of  some kinds of SE
+    analytics, ``the luxuries of interactivity, direct manipulation, and fast system response are gone''~\cite{fisher2012interactions}. They
+    characterize modern cloud-based analytics as a throwback to the 1960s-batch processing mainframes where
+    jobs are submitted and then analysts wait, wait, wait for results with ``little insight into what's really going
+    on behind the scenes, how long it will take, or how much it's going to cost''~\cite{fisher2012interactions}. Fisher et al. document
+    the issues seen by 16 industrial data scientists, one of whom remarks ``\underline{{\bf Fast iteration is key}}, but incompatible
+    with the say jobs are submitted and processed in the cloud. It's frustrating to wait for hours, only to realize
+    you need a slight tweak to your feature set.''.
     
-    These modern-day states of the art systems like CNN~\cite{lai2015recurrent} or Deep learning~\cite{lecun2015deep} sometimes being implemented to solve and predict~\cite{yang2015deep,white2016deep} these data. But this presents us with a new challenge~\cite{chen2014big}, as mentioned above, these systems take long time to train thus we are losing luxuries of interactivity, direct manipulation, and fast system response. 
+    Fisher's experience matches with our own.   We find that the slower the data mining method, the worse
+    the user experience and the fewer the people willing to explore that method. These result is particularly
+    acute in research where data miners have to be run many times to (a) explore the range of possible behaviors
+    resulting from these methods or (b) generate the statistically significant results that can satisfy peer review.
+    To understand the CPU problems with validation, consider the standard validation loop:
     
-    In this paper we are trying to showcase methods that can achieve similar results in prediction, but takes very small amount of time to train in comparison with state of the art deep learning methods. This paper shows that with local model~\cite{menzies2011local} build by clustering data, we can make the whole model fast, which will enable us to make analysis faster, and solves some of the problems we saw earlier.
+    {\footnotesize \begin{verbatim}
+    1. FOR L = 20 projects DO
+    2.   FOR R = 20 times DO # repeats to satisfy central limit theorem
+    3      Randomly divide project.data to B = 10 bins;
+    4      FOR i = 1..B DO
+    5        test = bin[i]
+    6        train = project.data - test
+    7.       FOR F = 5 different data filters DO
+    8.         train = filter(train) # e.g. over-sample rare classes
+    9.         model = leaner(train)
+    10.        print report(apply(model,test))
+    \end{verbatim}
+    }
+    Note the problem with this loop- it must call a data miner (at line~9) 
+    $L * R * B * F = 20,000$ times. While
+    some data miners are very fast (e.g. Naive Bayes), some are not (e.g. deep learning). Worse, several ``local
+    learning'' results~\cite{menzieslocal,menzies2011local,xia2008local,menzies2013local} report that software analytics results are specific to the data set being processed-
+    which means that analysts may need to rerun the above loop anytime new data comes to hand.
+    
+    Note that the above problem is not solvable by (1)~waiting for faster CPUs or (2)~parallelization. We can no
+    longer rely on Moore's Law~\cite{moore1998cramming} to double our computational power very 18 months. Power consumption
+    and heat dissipation issues effectively block further exponential increases to CPU clock frequencies~\cite{moore1998cramming}. As
+    to parallelization, that would require the kinds of environments that Fisher et al. discuss; i.e. environments
+    where it is frustrating to wait for hours, only to realize you need a slight tweak to your feature setting. 
+     
+    Accordingly, in our research, whenever we have a slow and competent result, we explore methods to make that result faster. The rest of this paper offers a case study where local learner significantly speed up than deep learning.
+\subsection{Deep Learning}\label{sec:dl}
+    Deep learning is a type of machine learning algorithm based on multiple layers of neural networks, where each layer is created with multiple neurons. These layers are interconnected via weights, which are tuned as the model trains. These connections and weights are very specific to models and its performance. According to LeCun et al.~\cite{lecun2015deep}, deep learning methods are representation-learning methods with multiple levels of representation, obtained by composing simple but non-linear modules that each transforms the representation at one level (starting with the raw input) into a representation at a higher, slightly more abstract level. 
+    
+    Deep learning has been applied to many areas including
+    image processing, natural language processing, genomics etc:
+    \bi
+    \item Wan and Wang~\cite{wan2014deep},  deep learning tries to resolve the "Semantic Gap" issue in content based image retrieval process~\cite{smeulders2000content}.
+    \item
+    Deep learning has also been  used to predict DNA-RNA binding proteins~\cite{alipanahi2015predicting} which helps to solve problems faced by less sophisticated methods (particularly the problem of the automatic extraction of meaningful features from raw data).
+  \item
+    Deep learning has also recently become established its presence in software engineering effort
+    estimation~\cite{Choetkiertikul18} and text mining~\cite{choetkiertikul2016deep,mou2016convolutional,white2016deep,white2015toward,yuan2014droid,yang2015deep}. 
+    \ei
+    Deep learning is a computationally expensive method.  It often takes hours to weeks to train the models. This makes cross validation and stability of model check very expensive if not impractical. For example, the methods of Xu et al. take 14 hours to terminate or GU et al.~\cite{gu2016deep} reported in his paper that his deep learning model took almost 240 hours to train~\cite{gu2016deep}.  Note that if those computations were repeated (say) 20 times for statistically purposes, then those systems would take 11 and 200 days to complete. Worse still, hyperparameter optimization\footnote{
+    Hyperparameter optimizers are algorithms that learn the control parameters of a learner.
+    For more details on such algorithms, see \S\ref{sssec:Parameter Tuning with DE}.}
+    might require 100s to 1000s of repeated runs-- which would take another three to 50 years to terminate\footnote{Note
+    that such long runtimes have   been observed in the SE literature. In 2013, a team from UCL needed 15 years of CPU time to complete the hyperparameter optimization study of four software clone detection tools~\cite{Wang13s}.}.
+    
+For the above reasons, reproducing   deep learning results is a significant problem:
+    
+    \bi
+    \item Most deep learning paper's baseline methods in SE are either not publicly available or too complex to implement~\cite{white2016deep,lam2015combining}.
+    \item It is not yet common practice for deep learning researchers to share their implementations and data~\cite{white2016deep,white2015toward,lam2015combining,wang2016automatically,choetkiertikul2016deep,gu2016deep},  where a tiny difference may lead to a huge difference in the results.
+    \item Due to the nature of complexity in implementation and unavailability of original implementation, data or environment it is not possible to implement a deep learner for baseline purpose, and this is one of the reasons for SE community and this paper to directly utilizes the results published for comparison~\cite{lam2015combining,fu2017easy}.
+    \ei
+    Hence, much research (including this paper) is forced to compare their new methods with published numbers in deep learning papers (rather than re-running the rig of the other  researchers.)
+    
+    
+    As discussed below,
+    local learning is one method for reducing that runtime.
+    
+     
 
+   
     
-    \subsection{Benefits of Local Models}
-    \label{sssec:Benefits of Local Models}
-    Local models are models build on clusters of data from the original data space which are similar in nature and might be different from other clusters. Wolpert and Macready said in their paper "no free lunch theorems for optimization" theorems ~\cite{wolpert1997no}, if an algorithm works well in one situation, there is another in which it does not. This tells us that learners perform differently on each dataset~\cite{agrawal2017better}. But more than that, what if the data is sparse~\cite{xia2008local} and there are different regions in the data? Just like using the same learner on different datasets, using the same learner on every region of the data is not preferred. Ideally, a learner should be able to make different decisions for different regions of data. Local models has been proven to be successful in defect prediction in Software Engineering field~\cite{menzies2007data,menzies2011local,menzies2013local}.
+   
+ 
     
-    Time and CPU resources are other important factors to consider when using learners. Although today we have access to cloud resources~\cite{buyya2008market} and the processing power increasing every year to help with speeding up computationally-expensive tasks, the cost can be prohibitively expensive, also improvement of the run time depends on the complexity of the algorithm. For example an algorithm with complexity of O($2^n$) will only speedup by a few secs~\cite{cormen2009introduction} with a 1000 times powerful processing power and thus will not make much difference. This can make it hard for researchers to properly validate results, as well as for other researchers to repeat results. Resource cost needs to be more strongly considered when considering the tradeoffs of using particular learners. Local models working on smaller dataset helps to reduce these costs by both being less resource intensive and less time demanding. 
+    \subsection{Local Learning}
+    When running a data mining algorithm, all the training data can be used to build one training model. Alternatively,
+    the training data can be somehow divided into small pieces and one model learned per piece.
+    
+    Local models have shown promising results in different studies. Many researchers have found building specialized local models for specific regions of the data provides a better overall performance, thus according to the studies instead of trying to find a generalized model we should try to find best models specific to different region of data. 
+    For example, Menzies et al.~\cite{menzieslocal} shows that for defect prediction and effort estimation, lessons learned from models build on small part of data set from PROMISE repository were superior to the generalized model build on all the data.
+    That said,
+    recent studies have suggested for at least for defect prediction, the benefit of local model may be learner specific~\cite{herbold2017global}.
+    
+    This paper explored local learning
+    for a somewhat different perspective.
+     The claim made in this paper is not that local models always performs significantly better. Rather we     recommend it since it can lead to significantly faster inference with very little compromise in the performance
+     of the learned model. 
+     
+     More specifically, in this study we observer a three order of magnitude improvement over a prior text mining results by Xu et al~\cite{xu2016predicting}. Hence we recommend local learning since:
+    
+     \begin{itemize}
+        \item It rarely performs worse than learning from all the data.
+        \item Sometimes it can lead to better performance~\cite{menzieslocal,menzies2011local,bettenburg2012think,posnett2011ecological}.
+        \item It can lead to significantly faster training times.  
+    \end{itemize}
     
     
+    The general framework for local learning is shown as a algorithm in Figure~\ref{fig:local_Learning}. This algorithm uses a cluster based model with the training dataset to find diversity in the dataset. This helps to create clusters with similar data. Now different classification models are accessed and improved via hyperparameter tuning on each of the clusters with local data as training dataset. While accessing the model for performance, the test data is sent through the clustering model to predict its probable cluster by calculating similarity measure, next the test data is classified using the local model built on that cluster.
     
-    \subsection{SVM in Text Mining}
-    \label{sssec:SVM in Text Mining}
-    Support Vector Machines (SVM) are a type of supervised machine learning algorithm which analyzes data using classification or regression analysis. In SVM models the examples are points in space mapped in such a way that separate categories/classes are divided by as clear gap (plane or line) as possible. SVM ~\cite{suykens1999least} does this by transforming the original data space to a high dimensional space called feature space, and then uses hyper boundary to separate the classes/features.  
+    The rest of this paper explores the local learning framework of Figure~\ref{fig:local_Learning} using 
+    the following learning methods:
+    \begin{itemize}
+    \item
+    K-means
+    for the clustering;
+    \item
+    Differential evolution for the fitting;
+    \item
+    SVM or Kth-nearest neighbor for the classification.
+    \end{itemize}
+    For details on these methods, see later in this paper.
     
-    Datasets in text mining can have a very large number of features~\cite{gamon2004sentiment}. These features are relevant as they define the record/data point thoroughly and hence can't be thrown away. In most cases the document vectors are sparse and linearly separable. Because the learning capability of SVMs is independent of the dimensionality of the feature space ~\cite{joachims1998text}, it is very effective on text mining datasets.
     
-    \subsection{KNN in Text Mining}
-    \label{sssec:KNN in Text Mining}
-    K-Nearest Neighbor ~\cite{zhang2007ml} (KNN)  is another type of supervised machine learning algorithm. It is a non-parametric ~\cite{goldberger2005neighbourhood} method used for classification and regression problems. Here K is the input and refers to the number of closest examples that the model will look for among the training data in the feature space. The output the model gives represents the class to which the test data belongs to and it depends on the majority vote of its k-nearest neighbor.
-  
-    KNN is one of the simplest types of machine learning algorithm to be used in text mining. KNN is widely researched and used for patent classification~\cite{fall2003automated}. A document is classified using the K nearest documents to it and then doing a majority vote in them, by using vector based distance method to calculate the similarity among the document matrices ~\cite{mihalcea2006corpus}.
-    
-    \subsection{K-Means Clustering}
-    \label{sssec:K-Means Clustering}
-    K-means is an unsupervised learning machine learning algorithm that is used for clustering data ~\cite{jain2010data}. In k-means, {\em k} is an input that refers to the number of clusters the data set should be divided into. The algorithm initializes {\em k} number of centroids from the data and labels each as a cluster. For each data point it checks which centroid it is closest to, and assigns it to that cluster. After one pass to the data, centroids are recalculated and the process repeats until cluster stability is achieved. There are many parameters to control in k-means and there are multitude of ways to choose to customize these parameters. For instance, picking initial centroids, number of clusters, distance metric to compute point to centroid, number of iterations, criterion to stop the algorithm and so forth. In our experiments, we use the scikit-learn module -  sklearn.cluster.kMeans ~\cite{pedregosa2011scikit}. This method expects a k-value - or the number of initial centroids to supplied.
+
+     
     \begin{figure}[!t]
     \small
      \begin{lstlisting}[mathescape,linewidth=7.5cm,frame=none,numbers=right]
-      #training data, max cluster
-      def GAP( tData, nrefs=3, cMax = 15): 
-        gaps = [] # array of size cMax to store gap values
-        resultsdf = pd.DataFrame({'clusterCount': [], 'gap': []}) # maintains gap value for cluster size 1-15
-        
+      def localLearning (data):
+        models = []
+        predicted = []
+        cluster_model = model$_1$(args$_1$) # make clusters
+        cluster_model.fit(data.train)
+        data.train['cluster'] = cluster_model.labels
+        classification_model = model$_2$(args$_2$) # local classifier
+        for i in |cluster|
+          classification_model.fit(data.train[i]) # fitting model
+          models[i] = classification_model
+          #end for
+        data.test['cluster']= find nearest cluster for test data
+        for i in |cluster|
+          classification_model = models[i]
+          predicted[i]= classification_model.predict(data.test[i])
+          #end for
+        performance = compare(predicted,data.test['class'])
+      return performance    
+
+            \end{lstlisting} 
+            \vspace{-0.2cm}
+            \caption{Pseudo-code of Local Learning}
+            \label{fig:local_Learning} 
+            \vspace{-0.3cm}
+    \end{figure}
+
+    
+    \subsection{Word Embedding}
+    \label{sssec:Word Embedding}
+    In the case study of this paper, we explore local learning for text
+    mining methods that use word embedding. 
+    This is the process of converting words to vectors in order to compare their similarity by comparing cosine similarity between vectors. One method for doing this is a continuous skip-gram model~(word2vec), which is a unsupervised two-layer neural network that converts words into semantic vector representations ~\cite{mikolov2013distributed} and is also used by Fu et al.~\cite{fu2017easy} and Xu et al.~\cite{xu2016predicting} in their paper.
+    
+    The model learns vector representation of a word~(center word) by predicting surrounding words in a context window($c$) by maximizing the mean of log probability of the surrounding words~($w_{i+j}$), given the center word~($w_{i}$) - 
+    
+     \begin{equation}
+        \frac{1}{n}\sum_{i=1}^{n} \sum_{-c\leq j \leq c, j \neq 0} log p(w_{i+j}|w_i)
+    \end{equation}
+    
+    The  probability $p(w_{i+j}|w_i)$ is a conditional probability defined by a softmax function -
+    
+    \begin{equation}
+        p(w_{i+j}|w_i) = \frac{exp(v_{w_{i+j}}^{'T}v_{w_i})}{\sum_{w=1}^{|W|}exp(v_{w}^{'T}v_{w_i})}
+    \end{equation}
+    
+    Here the $v_{w}$ and $v_{w}^{'T}$ are respectively the input and output vectors of a word $w$ in the neural network, and W is the vocabulary of all words in the word corpus. $p(w_{i+j}|w_i)$ is normalized probability of word $w_{i+j}$ appearing in a specific context for a center word $w_i$. To improve the computation efficiency, Mikolove et al. ~\cite{mikolov2013distributed} proposed
+    hierarchical softmax and negative sampling techniques etc which can also be used for creating word embedding models.
+    
+    This paper uses the word2vec models trained by Fu et al.~\cite{fu2017easy} that converted the Stack Overflow text data into the corresponding vectors. For our experiments, 
+    we use    $100,000$ randomly selected  knowledge units tagged with ``java'' from
+    Stack Overflow {\it posts} table  (include titles, questions and answers).
+    This data was pruned by removing superflous
+    HTML tags (while keeping short code snippets in {\it code} tag), then fitted  into the {\it gensim} word2vec module ~\cite{rehurek2010software}.
+    This is  a python wrapper over original word2vec package where,  for   word $w_i$ in the post is sent to the trained word2vec model to get the corresponding word vector representation $v_i$. After converting, all the KUs the output vectors are then used for training and testing the models.
+    
+    \subsection{SVM in Text Mining}
+    \label{sssec:SVM in Text Mining}
+    Another component  of the case study explored here is support vector machines.
+    SVMs are a type of supervised machine learning algorithm which analyzes data using classification or regression analysis. In SVM models the examples are points in space mapped in such a way that separate categories/classes are divided by a clear gap (hyperplane in instance space)~\cite{suykens1999least}.
+    SVMs execute by  transforming the original data space to a higher dimensional space where hyperplane between data from different classes is easier to detect.
+    
+    SVMs are particularly useful for  in text mining can have a very large number of features~\cite{gamon2004sentiment}.  In most cases the document vectors are sparse and linearly separable in some hyper-dimensional space~\cite{joachims1998text}.
+    
+    \subsection{KNN in Text Mining}
+    \label{sssec:KNN in Text Mining}
+    If SVM is our most sophisticated classifier, our simplest is K-Nearest Neighbor~\cite{zhang2007ml}. KNN is a non-parametric ~\cite{goldberger2005neighbourhood} method used for classification and regression problems. Here {\em k} is the input and refers to the number of closest examples that the model will look for among the training data in the feature space. The output the model gives represents the class to which the test data belongs to and it depends on the majority vote of its k-nearest neighbor ~\cite{mihalcea2006corpus}.
+  
+    % KNN is one of the simplest types of machine learning algorithm to be used in text mining. KNN is widely researched and used for patent classification~\cite{fall2003automated}. A document is classified using the K nearest documents to it and then doing a majority vote in them, by using vector based distance method to calculate the similarity among the document matrices ~\cite{mihalcea2006corpus}.
+    
+    \subsection{KMeans Clustering}
+    \label{sssec:K-Means Clustering}
+    One way to reduce the computational cost of KNN is, before running a classifier,  group data into similar sets of clusters. KMeans is an unsupervised machine learning algorithm that is used for clustering data ~\cite{jain2010data}. In KMeans, {\em k} is an input that refers to the number of clusters the data set should be divided into. The algorithm initializes {\em k} number of centroids from the data and labels each as a cluster. For each data point it checks which centroid it is closest to, and assigns it to that cluster. After one pass to the data, centroids are recalculated and the process repeats until cluster stability is achieved. 
+    This experiments uses the scikit-learn module   sklearn.cluster.KMeans~\cite{pedregosa2011scikit}.
+    
+    % There are many parameters to control in k-means and there are multitude of ways to choose to customize these parameters. For instance, picking initial centroids, number of clusters, distance metric to compute point to centroid, number of iterations, criterion to stop the algorithm and so forth.  and
+    % use the Gap heuristic (described below) to find the right {\em k}.
+    \begin{figure}[!t]
+    \small
+     \begin{lstlisting}[mathescape,linewidth=7.5cm,frame=none,numbers=right]
+      def GAP( tData, nrefs=3, cMax = 15): # default settings
+        gaps = []
+        results = create empty dataframe
         for gap_index, k in enumerate(range(1, cMax)):
-          refDisps = [] # array to average for each cluster
-           
-          # for each cluster - run nrefs times
+          refDisps = array for inertia
           for i in range(nrefs):
-              # random subset of data - reference data
-              rRef = np.random(tData)  
-                
-              # build model for reference data subset
-              clf = KMeans(n_clusters=k,init=k-means++,max_iter=200, n_init=1)
+              rRef = random(tData) #reference data
+              clf = KMeans(k)
               clf.fit(rRef)
-              
-              refDisps[i] = clf.interia_ # store the SSE
-           
-          # Model for entire data set with k cluster
+              refDisps[i] = model inertia
+          #end for
           clf = KMeans(k)
           clf.fit(tData)
-          
-          orgDisp = clf.interia_ # store the SSE
-          
-          # calculate the gap value from the SSE's
-          refDispMean = np.mean(refDisps)  # Mean of refDisps
-          dispDiff = refDispMean - orgDisp # difference
-          gap = np.log(dispDiff) # log value of difference
-          
+          orgDisp = model inertia with k cluster
+          refDispMean = mean(refDisps)
+          dispDiff = refDispMean - orgDisp
+          gap = log(dispDiff)
           # append the gap value in the list 
-          resultsdf = results.append('clusterCount': k, 'gap': gap) 
-          gaps[gap_index] = gap # add to the gap array
-       
+          results = results.append('clusterCount': k, 'gap': gap) 
+          gaps[gap_index] = gap
       return gaps.argmax() # get cluster size with max gap
             \end{lstlisting} 
             \vspace{-0.2cm}
-            \caption{Pseudocode of GAP Statistics}
+            \caption{Pseudo-code of GAP Statistics}
             \label{fig:GAP_pseudocode} 
             \vspace{-0.3cm}
     \end{figure}
-    Picking a {\em k} value for k-means is a challenge. If the {\em k} is smaller, we can have a model under-fit that fails to capture any patterns in the data. On the other hand, if we had a very large {\em k}, we would be overfitting the model. The percent of variance explained will go up, but it is not capturing the bias in the data set. There are many theoretical ways to overcome this challenge and pick a sensible value for {\em k}. We used the "Gap statistics" to determine the optimal number of {\em k} or centroids for our k-means ~\cite{mohajer2011comparison}~\cite{tibshirani2001estimating}. The Gap statistic looks at the difference between the dispersion of the clustered data, and the dispersion of a null reference distribution, for increasing {\em k} values. It finds the largest {\em k} where the gap is bigger than the next gap minus a value that accounts for simulation error.   Figure~\ref{fig:GAP_pseudocode} describes the Gap statistic
+     \begin{table*}[!t]
+    \small
+        \centering
+       \begin{tabular}{c|c|c|c}
+         \rowcolor{darkgray} \textcolor{white}{\textbf{SVM}} & \textcolor{white}{\textbf{Default Parameter}}  & \textcolor{white}{\textbf{Tuning Range }} & \textcolor{white}{\textbf{Description}} \\
+            C & 1.0 & [1,50] & Penalty parameter of  error term \\ 
+            \rowcolor{lightgray} Kernal & `rbf' & [`liner', `poly', `rbf', `sigmoid'] & Specify the kernel type to be used in the algorithms \\ 
+            gamma & 1/n\_features & [0,1] & Kernel coecient for `rbf', `poly' and `sigmoid' \\ 
+             \rowcolor{lightgray}coef0 & 0 & [0,1] & Independent term in kernel function. It is only used in `poly' and `sigmoid' \\
+            \multicolumn{1}{c}{~}\\
+            \rowcolor{darkgray} \textcolor{white}{\textbf{KNN}} & \textcolor{white}{\textbf{Default Parameter}} & \textcolor{white}{\textbf{Tuning Range }} & \textcolor{white}{\textbf{Description}} \\ 
+            n\_neighbors & 5 & [2,10] & Number of neighbors \\ 
+            \rowcolor{lightgray} weights & `uniform' & [`uniform', `distance'] & weight function used for predictions 
+        \end{tabular}    
+        \caption{`Tuning Range' of Parameters for SVM and KNN}
+        \label{tab:DE_Parameters}
+    \end{table*}
+    
+    Picking an appropriate {\em k} value for KMeans is a challenge. If {\em k} is too small,  models will over-fit and  fails to capture any larger patterns in the data. On the other hand, if using a large {\em k} will increase the variability and hence the level of uncertainty within each cluster. accordingly, this study uses the {\em GAP statistics} to determine the optimal number of {\em k} or centroids for KMeans ~\cite{mohajer2011comparison,tibshirani2001estimating}. The GAP statistic looks at the difference between the dispersion of the clustered data, and the dispersion of a null reference distribution, for increasing {\em k} values. It finds the largest {\em k} where the gap is bigger than the next gap minus a value that accounts for simulation error.   Figure~\ref{fig:GAP_pseudocode} describes the GAP statistic
     computation~\cite{tibshirani2001estimating}.
     
     \subsection{Parameter Tuning with DE}
     \label{sssec:Parameter Tuning with DE}
-    Differential Evolution (DE) is a stochastic population based optimization algorithm~\cite{storn1997differential}. DE starts with a frontier of candidate solution, then randomly select candidates from the frontier. Next, a new candidate solution is generated by extrapolating the selected candidates by a certain amount, if the probability of crossover is above a certain value. In our DE, we are using extrapolation amount as 0.75, the crossover probability as 0.3 and we are doing 60 repeats to find the best solution.
+    All learners come with ``magic parameters'' that control their performance.
+    For example, with SVM, there are several parameter that control the SVM kernel.
+    One way to select those parameters is to use hyperparameter optimization via
+    algorithms like  
+    Differential Evolution. DE is a stochastic population-based optimization algorithm~\cite{storn1997differential}. DE starts with a frontier of randomly
+    generated candidate solutions.
+    For example, when exploring tuning, each member of the frontier would be a different possible set of control settings for (say) an SVM or KNN.
     
-    We are using DE to tune the parameters of SVM and KNN. We are following the same procedure for Tuner that Fu cited in his paper that is based on Storn's differential evolution optimizer as shown in Figure~\ref{fig:pseudo_DE}. With SVM and KNN, Fu's tuner tries to maximize the objective score of the model based F1-score. as mentioned in Figure~\ref{fig:pseudo_DE}.
+    After initializing this frontier, a new candidate solution is generated by extrapolating
+    by some factor $f$ between other items on the frontier. Such extrapolations are
+    performed for all attributes at probability {\em cf}.
+    If the candidate is better than one item of the frontier, then the candidate replaces the frontier item. The search then repeats for the remaining frontier items.
+    For the definition of ``better``, this study uses the same performance measures as Fu et al.; i.e. 
+   ``better'' means maximizing  the objective score of the model based F1 Score.
+    
+    
+    This process is repeated for {\em lives} number of repeated traversals of the frontier.
+        For full details of DE,  see fFgure~\ref{fig:pseudo_DE}. As per Storn's advice~\cite{storn1997differential} we use \[f=0.75, \mathit{cf}=0.3,
+    \mathit{lives}=60\]
+
+    
+ 
     
     \begin{figure}[!t]
     \small 
@@ -373,39 +613,32 @@ can     great simplify the learning task   without  negatively  impacting   mode
         # end while
         return best
     \end{lstlisting} 
-    \caption{Tuner Procedure - as mentioned in Fu\textquotesingle s paper. It is based on Storn\textquotesingle s DE optimizer.}
+    \caption{Tuner Procedure - as mentioned in Fu et al.\textquotesingle s paper. It is based on Storn\textquotesingle s DE optimizer.}
     \label{fig:pseudo_DE} 
     \vspace{-0.3cm}
     \end{figure}
     
     
-    For SVM, we used the SVM module from Scikit-learn~\cite{pedregosa2011scikit}, a Python package for machine learning, where the parameters shown in Table~\ref{tab:DE_Parameters} are selected for tuning. Parameter C is to set the amount of regularization, which controls the tradeoff between the errors on training data and the model complexity. A small value for C will generate a simple model with more training errors, while a large value will lead to a complicated model with fewer errors. Kernel is to introduce different nonlinearities into the SVM model by applying kernel functions on the input data. Gamma defines how far the influence of a single training example reaches, with low values meaning 'far' and high values meaning 'close'. coef0 is an independent parameter used in sigmod and polynomial kernel function.
+    For SVM, this study uses the SVM module from Scikit-learn~\cite{pedregosa2011scikit}, a Python package for machine learning, where the following parameters shown in Table~\ref{tab:DE_Parameters} are selected for tuning:
+    \bi
+    \item
+    Parameter $C$ is to set the amount of regularization, which controls the trade-off between the errors on training data and the model complexity. A small value for $C$ will generate a simple model with more training errors, while a large value will lead to a complicated model with fewer errors. 
+    \item 
+    {\em gamma} defines how far the influence of a single training example reaches, with low values meaning 'far' and high values meaning `close'.
+    \item
+    {\em coef0} is an independent parameter used in sigmod and polynomial kernel function to scale the data.
+    \ei
+    Similarly KNN uses different parameters to control how it learns and how it predicts. This study uses KNN module from Scikit-learn, and the parameters in   Table~\ref{tab:DE_Parameters}. For KNN:
+    \bi
+    \item Parameter $n\_neighbors$ is number of neighbors to be used for query to check and   classification using a  majority vote ~\cite{guo2003knn}. 
+    \item
+    $weight$ is another parameter which is tuned as part of hyperparameter tuning. If set to `uniform', then   all the points in each neighborhood are weighted equally. If set
+    to `distance', then the weights are inverse of their distance from the new example (so farther away the point, the less weight  it has in deciding the class).
+    \ei
     
-    Similarly KNN uses different parameters to control how it learns and how it predicts. For our experiment we have used KNN module from Scikit-learn, and the parameters in the table~\ref{tab:DE_Parameters} are selected for tuning the KNN. Parameter n\_neighbors is number of neighbors to be used for query to check and then use the classification based on majority vote ~\cite{guo2003knn}. Weight is another parameter which we are tuning, this parameter is used for prediction, it accepts value as 'uniform' where all the points in each neighborhood are weighted equally and other option in this is 'distance', here the weights are inverse of their distance from the new example so farther the point less weightage it has in deciding its class.
+   
     
-    \begin{table}[h!]
-    \small
-        \centering
-       \begin{tabular}{p{1.4cm}|p{2cm}|p{4.1cm}}
-         \rowcolor{darkgray} \textcolor{white}{\textbf{SVM}}      & \textcolor{white}{\textbf{Tuning Range }} & \textcolor{white}{\textbf{Description}} \\
-            C & [1,50] & Penalty parameter of  error term \\ 
-            \rowcolor{lightgray} Kernal & ['liner', 'poly', 'rbf', 'sigmoid'] & Specify the kernel type to be used in the algorithms \\ 
-            gamma & [0,1] & Kernel coecient for 'rbf', 'poly' and 'sigmoid' \\ 
-             \rowcolor{lightgray}coef0 & [0,1] & Independent term in kernel function. It is only used in 'poly' and 'sigmoid' \\
-            \multicolumn{1}{c}{~}\\
-            \rowcolor{darkgray} \textcolor{white}{\textbf{KNN}} & \textcolor{white}{\textbf{Tuning Range }} & \textcolor{white}{\textbf{Description}} \\ 
-            n\_neighbors & [2,10] & Number of neighbors \\ 
-            \rowcolor{lightgray} weights & ['uniform', 'distance'] & weight function used for predictions 
-        \end{tabular}    
-        \caption{'Tuning Range' of Parameters for SVM and KNN}
-        \label{tab:DE_Parameters}
-    \end{table}
-    
-    \subsection{Word Embedding}
-    \label{sssec:Word Embedding}
-    Word embedding is the process of converting words to vectors in order to compare their similarity. One method for doing this is Word2Vec, specifically the skip gram model, which is a two-layer neural network that converts words into semantic vector representations ~\cite{mikolov2013distributed}.
-    
-    In this paper, we use the word2vec models trained by Fu to convert the Stack Overflow text data into the corresponding vectors.
+
 
 
 
@@ -413,9 +646,12 @@ can     great simplify the learning task   without  negatively  impacting   mode
 \label{sect: Experimental Design}
     \subsection{Data}
     \label{sssec:Data}
-    This experiment uses the same training and testing dataset as Xu ~\cite{xu2016predicting} and Fu ~\cite{fu2017easy}. Because we were not able to implement Xu\textquotesingle s CNN, we use the same datasets so that we can compare our results without introducing implementation bias. These datasets include 6,400 training examples and 1,600 testing examples. Each class is equally represented in both the training and test datasets, with 1600 of each class in the training dataset and 400 of each class in the test dataset, so no handling of class imbalance is necessary.
+    This experiment uses the same training and testing dataset as Xu et al. ~\cite{xu2016predicting} and Fu et al. ~\cite{fu2017easy}. For the reasons discussed
+    in Section~\ref{sec:dl}, this study compares our results to those reported by  Xu et al.  
     
-    Both test and training data are in Pandas dataframe ~\cite{mckinney2011pandas} format, which includes a post Id, related post id, and a link type which is determined by a score between the 2 posts. The link between 2 posts can be of 4 types depending on the score between the sentences as per Table~\ref{tab:data_classl} - 
+    Our dataset includes 6,400 training examples and 1,600 testing examples. Each class is equally represented in both the training and test datasets, with 1600 of each class in the training dataset and 400 of each class in the test dataset, so no handling of class imbalance is necessary.
+    
+    Both test and training data are in Pandas dataframe ~\cite{mckinney2011pandas} format, which includes a post Id, related post id, and a link type which is determined by a score between the 2 posts. The link between 2 posts can be of 4 types depending on the score between the sentences as per Table~\ref{tab:data_classl}.
     
     \begin{table}[h!]
         \centering
@@ -429,75 +665,7 @@ can     great simplify the learning task   without  negatively  impacting   mode
         \caption{Classification of data}
         \label{tab:data_classl}
     \end{table}
-    
-    For finding word embeddings ~\cite{mikolov2013distributed} of Stack Overflow ~\cite{barua2014developers} post data, this paper uses the word2vec model trained by Fu. Fu metions in his paper, the word2vec model was created by randomly selecting 100,000 knowledge units tagged with "Java" as the word corpus, preprocessing data as recommended by Xu, and then fitting the corpus into a Python word2vec ~\cite{rehurek2010software} wrapper. To create a word embedding for each post, the word2vec model is used to create vector representations of each word, and then these vectors are averaged to get a vector for the entire document. Next, to get a vector representation of the pair of documents, the vector representations for each KU is then averaged. This is the value that is passed to the learners. The final data that is being passed to the learner is similar to Table~\ref{tab:data_format}
-    
-    \begin{table}[h!]
-        \centering
-        \begin{tabular}{p{.3cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}}
-        \rowcolor{darkgray} \textcolor{white}{\textbf{ID}} & \textcolor{white}{\textbf{Post Id}} & \textcolor{white}{\textbf{Related Post Id}} & \textcolor{white}{\textbf{Link Type Id}} & \textcolor{white}{\textbf{Post Id Vec}} & \textcolor{white}{\textbf{Related Post Id Vec}} & \textcolor{white}{\textbf{Output}}  \\
-        0 & 283 & 297 & 1  & [...] & [...] & [...] \\
-        \rowcolor{lightgray} 1 & 56 & 68 & 2  & [...] & [...] & [...] \\
-        2 & 5 & 16 & 3  & [...] & [...] & [...] \\
-        \rowcolor{lightgray} 3 & 9083 & 6841 & 4  & [...] & [...] & [...] \\
-        \end{tabular}
-        \caption{Training/Test data in Pandas.dataframe format.}
-        \label{tab:data_format}
-    \end{table}
-    
-    \subsection{Method}
-    \label{sssec:Method}
-    Training a models and hyper-parameter tuning technique can take large amount of time depending on the size of the training dataset. This makes the cross validation and retraining harder to achieve. This study check if dividing up the data into small clusters and then train and tune models in parallel can speedup learning so the proposed method is to build local models, in order to reduce learner's training time. In order to do this the data is clustered first, then a model is built for each cluster, parallelly. This process is shown in Figure~\ref{fig:our_model}.
-    
-    For the clustering algorithm K-Means algorithm from Scikit-learn has been used. For the parameters, this study used the k-means++ algorithm ~\cite{arthur2007k} for the initialization of cluster centroids, 200 maximum iterations, and 1 as the number of times the algorithm will run with different centroids. In order to choose K, the number of clusters, the GAP statistic method, discussed above has been utilized.
-    
-    For each cluster, a learner is built that is tuned specifically for that cluster. This study looks at two different learners, SVM and KNN. As discussed above, to tune the learners, DE is being used, specifically Fu\textquotesingle s implementation. The study uses f1-Score ~\cite{sokolova2006beyond} to evaluate the intermediate models in DE, as f1-score is calculated as the tradeoff between precision and recall. This will help us to get models which have both good precision and recall.
-    
-    \begin{figure}[!t]
-    \small 
-    \begin{lstlisting}[mathescape,linewidth=8.5cm,frame=none,numbers=right ]
-      def KMeans(Word2Vec_model):  # Stack Overflow word2vec model
-        trainData, testData = Word2Vec.trainData, Word2Vec.testData
-        trainX, trainY = trainData['Output'], trainData['LinkTypeID']
-        queue = Queue() #queue to get the result back from thr
-        start = timer.start
-        numCluster = GAP(trainX) #best cluster by GAP statistic
-        clf = KMeans(n_cluster = numCluster, init='k-means++', max_iter=200, n_init=1)
-        clf.fit(trainX) #KMeans Training
-        trainData['clabels'] = clf.labels_
-        target_model = SVM/KNN
-        for l in range(numCluster):
-            t = threading.Thread(target = target_model, args = [word2vec_src,cluster,queue,l]) #thread initialization
-            threads.append(t)
-        for th in threads:
-            th.start()
-        for th in threads:
-            svm_models.append(queue.get) #models returned by queue
-        svm_model.sort() #sort by initialization sequence
-        stop = timer.stop
-        predicted['clabels'] = clf.predict(testX)
-        for i in range(svm_models[l])-1): #for each iteration in cross validation
-            for l in range(numClusters): #for each model in cluster
-                cluster = predicted['clabels'] 
-                svm_model = svm_models[l][i]
-                clusterX = cluster['Output']
-                clusterY = cluster['LinkTypeId']
-                totalClusterY = np.append(totalClusterY,clusterY)
-                predictedC = svm_model.predict(clusterX)
-                totalPredicted = np.append(totalPredicted,predictedC)
-            report_gen = metrics.classification_report(totalClusterY, totalPredicted, labels=["1", "2", "3", "4"], digits=3)
-        return time_taken = stop - start   
-    \end{lstlisting} 
-    \caption{Algorithm for creating the clusters and running the SVM/KNN on them}
-    \label{fig:pseudo_KMeans} 
-    \vspace{-0.3cm}
-    \end{figure}
-    
-    To use the model, the test data is first sent to K-means to find the cluster which it should belong to by calculating vector distance from all cluster's centroid and returning the cluster with minimum distance. Then the model predict the class using that cluster\textquotesingle s learner.
-    
-    In this study a 10-fold cross validation ~\cite{kohavi1995study} has been used, which was repeated 10 times for the training data. Thus, the results are the average of 100 models. Each learner (SVM or KNN) on each cluster has been trained on 90\% of the data from that cluster and tuned on rest of the 10\% and then tested on the untouched test data set. 
-    
-    \begin{figure*}
+        \begin{figure*}
         \centering
         \tcbox[sharp corners, boxsep=1mm, boxrule=0.5mm, 
             colframe=blue!30!black, colback=white]{\includegraphics[width=0.8\textwidth]{fig/Models.png}}
@@ -506,10 +674,90 @@ can     great simplify the learning task   without  negatively  impacting   mode
     \end{figure*}
     
     
+    For finding word embedding ~\cite{mikolov2013distributed} of Stack Overflow ~\cite{barua2014developers} post data, this paper uses the word2vec model trained by Fu et al. and described in Section \ref{sssec:Word Embedding}.
+     The final data that     passed to our classifiers is similar to Table~\ref{tab:data_format}.
+    
+    % \begin{figure}[!t]
+    % \small 
+    % \begin{lstlisting}[mathescape,linewidth=8.5cm,frame=none,numbers=right ]
+    %   def createLocalModel(Word2Vec_model,r):
+    %     trainData, testData = Word2Vec.trainData, Word2Vec.testData
+    %     trainX, trainY = trainData['Output'], trainData['LinkTypeID']
+    %     queue = Queue() #queue to get the result from thread
+    %     timer.start
+    %     numCluster = GAP(trainX) #best cluster by GAP statistic
+    %     clf = KMeans(numCluster)
+    %     clf.fit(trainX)
+    %     trainData['clabels'] = clf.labels_
+    %     for l in range(numCluster):
+    %         args = [word2vec_src,cluster,queue,l]
+    %         threads.append(Thread(target_model, args))
+    %         if r != parallel #sequential run
+    %             threads.start
+    %     #end for
+    %     if r == parallel
+    %         threads.start #thread execution starts
+    %     for th in threads:
+    %         models.append(queue.get) #models returned by queue
+    %     #end for
+    %     model.sort() #sort by initialization sequence
+    %     timer.stop
+    %     predicted['clabels'] = clf.predict(testX) #find cluster for test data
+    %     for i in range(svm_models[l])-1): #each iteration in cross validation
+    %         for l in range(numClusters): #each model in cluster
+    %             cluster = predicted['clabels'] 
+    %             model = models[l][i]
+    %             clusterX, clusterY = cluster['Output'], cluster['LinkTypeId']
+    %             clusterY$_t$ = np.append(clusterY$_t$,clusterY)
+    %             predictedC = model.predict(clusterX) # local model prediction
+    %             predicted$_t$ = np.append(predicted$_t$,predictedC)
+    %         #end for
+    %         result = getResult(clusterY,predicted$_t$)
+    %     #end for
+    %     return time_taken   
+    % \end{lstlisting} 
+    % \caption{Algorithm for creating the clusters and running the SVM/KNN on them}
+    % \label{fig:pseudo_KMeans} 
+    % \vspace{-0.3cm}
+    % \end{figure}
+
+
+
+    \begin{table}[]
+        \centering
+        \label{my-label}
+            \begin{tabular}{l|l|l|l|l|l|l}
+            \rowcolor[HTML]{9B9B9B} 
+            {\color[HTML]{FFFFFF} \textbf{ID}} & {\color[HTML]{FFFFFF} \textbf{\begin{tabular}[c]{@{}l@{}}Post\\  Id\end{tabular}}} & {\color[HTML]{FFFFFF} \textbf{\begin{tabular}[c]{@{}l@{}}Related \\ Post Id\end{tabular}}} & {\color[HTML]{FFFFFF} \textbf{\begin{tabular}[c]{@{}l@{}}Link \\ Type \\ Id\end{tabular}}} & {\color[HTML]{FFFFFF} \textbf{\begin{tabular}[c]{@{}l@{}}Post \\ Id Vec\end{tabular}}} & {\color[HTML]{FFFFFF} \textbf{\begin{tabular}[c]{@{}l@{}}Related \\ Post Id \\ Vec\end{tabular}}} & {\color[HTML]{FFFFFF} \textbf{Output}} \\
+            0 & 283 & 297 & 1 & {[}...{]} & {[}...{]} & {[}...{]} \\
+            \rowcolor{lightgray} 1 & 56 & 68 & 2 & {[}...{]} & {[}...{]} & {[}...{]} \\
+            2 & 5 & 16 & 3 & {[}...{]} & {[}...{]} & {[}...{]} \\
+            \rowcolor{lightgray} 3 & 9083 & 6841 & 4 & {[}...{]} & {[}...{]} & {[}...{]}
+            \end{tabular}
+        \caption{Training/Test data in Pandas.dataframe format.}
+        \label{tab:data_format}
+    \end{table}
+
+    \subsection{Method}
+    \label{sssec:Method}
+    Training a models and hyper-parameter tuning technique can take much time, depending on the complexity of the training dataset. This makes it harder to perform cross validation or repeatability of prior results. This study check if dividing up the data into small clusters and then train and tune models within each cluster, reduces
+    the overall learner's training time. In order to do this the data is clustered first, then a model is built for each cluster. This process is shown   Figure~\ref{fig:our_model}.
+    
+    For the clustering algorithm KMeans algorithm from Scikit-learn has been used. For the parameters, this study used the k-means++ algorithm ~\cite{arthur2007k} for the initialization of cluster centroids. In order to choose {\em k}, the number of clusters, the GAP statistic method, discussed in Figure~\ref{fig:GAP_pseudocode} has been utilized.
+    
+    For each cluster, a learner is built that is tuned specifically for that cluster. This study looks at two different learners, SVM and KNN. As discussed above, to tune the learners, DE is being used, specifically Fu et al.\textquotesingle s DE implementation. The study uses F1 Score ~\cite{sokolova2006beyond} to evaluate the intermediate models in DE, as F1 Score is calculated as the trade-off between precision and recall. This will help us to get models which have both good precision and recall.
+    
+   
+    
+    To use the model, the test data is first sent to KMeans to find the cluster which it should belong to by calculating vector distance from all cluster's centroid and returning the cluster with minimum distance. Then the model predict the class using that cluster\textquotesingle s learner.
+    
+    In this study a 10-fold cross validation ~\cite{kohavi1995study} has been used, which was repeated 10 times for the training data. Thus, the results are the mean of 100 models. Each learner (SVM or KNN) on each cluster has been trained on 90\% of the data from that cluster and tuned on rest of the 10\% and then tested on the untouched test data set. 
+    
+
     
     \subsection{Performance Criteria}
     \label{sssec:performance_criteria}
-    For evaluating the described model, this study collects and present the same metrics for performance evaluation as Xu and Fu, in order to compare results. These metrics are precision, recall and f1-score. This multiclass classification problem have 4 classes denoted as Duplicate(C1), Direct Link(C2), Indirect Link(C3) and Isolated(C4). In the results, we present class-wise metrics as well as the average for the whole model.
+    For evaluating the described model, this study collects and present the same metrics for performance evaluation as Xu et al. and Fu et al., in order to compare results. These metrics are precision, recall and F1 Score. This multiclass classification problem have 4 classes denoted as Duplicate(C1), Direct Link(C2), Indirect Link(C3) and Isolated(C4). The result presents class-wise metrics as well as the mean for the whole model.
     
     \begin{table}[h!]
         \centering
@@ -531,271 +779,289 @@ can     great simplify the learning task   without  negatively  impacting   mode
         \label{tab:confusion_matrix}
     \end{table}
     
-    Now from the confusion matrix describe above in Table~\ref{tab:confusion_matrix}, it can be observed that the correct predictions are the one with label {\em Cii} for a class {\em Ci}. Now from this we will be able to calculate our evaluation matrixs. So here if a class {\em Ci} has been classified as {\em Cj} then it will be calculated as a wrong classification according to our confusion matrix.
+    From the confusion matrix describe in Table~\ref{tab:confusion_matrix}, it can be observed that the correct predictions are the one with label {\em Cii} for a class {\em Ci}. And from this we will be able to calculate our evaluation matrix. Using
+    this nomenclature, the evaluation metric {\em F1 Score} can be defined as follows:
     
-    So from the confusion matrix calculation of the precision, recall and F-Score can be done as follows
     
     \begin{equation}
-        precision = \frac{C_i_i}{\sum\limits_{i}C_i_j}
+        \mathit{precision} = \frac{C_{ii}}{\sum\limits_{i}C_{ij}}
     \end{equation}
         \begin{equation}
-        recall = \frac{C_i_i}{\sum\limits_{i}C_j_i}
+        \mathit{recall} = \frac{C_{ii}}{\sum\limits_{i}C_{ji}}
     \end{equation}
         \begin{equation}
-        F-Score = \frac{2*recall*precision}{(precision + recall)}
+        \mathit{F1} = \frac{2*\mathit{recall}*\mathit{precision}}{(\mathit{precision} + \mathit{recall})}
     \end{equation}
 
     \subsection{Statistical Analysis}
     \label{sssec:Statistical Analysis}
-    In order to compare results of the local models with other models, there are two useful tests: significance tests ~\cite{bentler1980significance} and effect size tests ~\cite{rosenthal1994parametric}~\cite{chen2002correlation}. Whereas significance tests tell statistically whether results are distinct enough to be considered different, effect size tells us whether that difference is actually interesting. In order to determine whether the difference in performance of different methods is significant, this study uses the Scott-Knott test, which ranks treatments using a recursive bi-clustering algorithm. At each level, treatments are split where expected value of the treatments has most changed from before. Results in each rank are considered the same according to both significance and effect size tests. Specifically, the Scott-Knott test uses the nonparametric bootstrap ~\cite{efron1982jackknife} method and A12 test.
-    
-
-\section{Results}
-\label{sect:Result}
-    In this section we try to answer the research questions that we have asked as per this experiment. This includes all the experimental results along with our take on that. 
-    
-    So as part of the experiment this study tries to compare the result of Fu\textquotesingle s DE SVM with our clustered with DE SVM  and clusterer then DE KNN. And also tries to compared the result with XU\textquotesingle s CNN with models from this study. 
-    
-    \textbf{RQ1}:  {\em Can we reproduce Fu\textquotesingle s results for tuning SVM with differential evolution (DE)?}
-    
-    This study uses same differential evolution with SVM for both global and local models. Thus to compare with FU's DE with SVM as global model, the first task as part of this experiment was to recreate Fu\textquotesingle s work so that we have a baseline to measure against. The study uses the same SVM from Scikit-learn with the parameters tuned as mentioned in Table~\ref{tab:DE_Parameters}.Here the training time of the DE+SVM model is also compared with Fu\textquotesingle s model. Table~\ref{tab:performance Measure comp} below shows the class by class comparison for all the performance measure this study is using.
-    
-    From Table~\ref{tab:performance Measure comp} and Figure~\ref{fig:delta_comp_Fu's_ours} it is safe to say that the model this study uses, SVM with DE for hyperparameter tuning ~\cite{duan2003evaluation}~\cite{fu2017easy} is similar to what Fu has used in his paper. It can be observed from this figure that for most of the cases apart from class 3, the model has performed a little better, but the delta between the performance is very small to consider. So to answer RQ1, this study has successfully implemented Fu\textquotesingle s SVM and seeing the results it can be assumed that we will be able to use this implementation to compare this study's results and use this version of DE+SVM implementation~\cite{fu2017easy} for the next part of the experiment.
-        \begin{table}
+    In order to compare results of the local models with other models, there are two useful tests: significance tests ~\cite{bentler1980significance} and effect size tests ~\cite{rosenthal1994parametric}~\cite{chen2002correlation}.
+   \bi
+   \item
+  Significance tests assess if  results are distinct enough to be considered different;
+  \item
+  Effect size tells us whether that difference is large enough to be  interesting. 
+  \ei
+  After Wu et al.,  this study uses the Scott-Knott test, which ranks treatments using a recursive bi-clustering algorithm. At each level, treatments are split where expected value of the treatments has most changed from before. Results in each rank are considered the same according to both significance and effect size tests. As per the recommendations of Wu et al., the Scott-Knott test uses the nonparametric bootstrap ~\cite{efron1982jackknife} method and Cliffs' Delta. Note that these two tests are also used and endorsed by other SE
+  researchers~\cite{ghotra2015revisiting}.
+  \begin{table}[!b]
         \centering
-        \begin{tabular}{c|p{2cm}|p{2cm}|p{2cm}}
-            \rowcolor{darkgray} \textcolor{white}{\textbf{Class}} & \textcolor{white}{\textbf{Precision Avg}} & \textcolor{white}{\textbf{Recall Avg}} & \textcolor{white}{\textbf{F-Score Avg}} \\
-            C1 & \begin{tabular}{c|c}
-                0.91  & 0.88 \\
-             \end{tabular} & \begin{tabular}{c|c}
-                0.92  & 0.86 \\
-             \end{tabular}  & \begin{tabular}{c|c}
-                0.92  & 0.88 \\
+        \begin{tabular}{c|c}
+            \rowcolor{darkgray} \textcolor{white}{\textbf{Class}} & \textcolor{white}{\textbf{F1 Score Mean}} \\
+            \rowcolor{darkgray} & \begin{tabular}{c|c}
+                 \textcolor{white}{\textbf{Our DE\_SVM   }}  &  \textcolor{white}{\textbf{Fu's DE\_SVM}} \\
              \end{tabular}\\
-            \rowcolor{lightgray} C2 & \begin{tabular}{c|c}
-                0.92  & 0.85 \\
-             \end{tabular} & \begin{tabular}{c|c}
-                0.91  & 0.83 \\
-             \end{tabular}  & \begin{tabular}{c|c}
-                0.91  & 0.84 \\
+            Duplicate & \begin{tabular}{c|c}
+                92  & 88 \\
              \end{tabular}\\
-            C3 & \begin{tabular}{c|c}
-                0.97  & 0.99 \\
-             \end{tabular} & \begin{tabular}{c|c}
-                0.99  & 0.99 \\
-             \end{tabular}  & \begin{tabular}{c|c}
-                0.98  & 0.97 \\
+            \rowcolor{lightgray} 
+            Direct link & \begin{tabular}{c|c}
+                91  & 84 \\
              \end{tabular}\\
-            \rowcolor{lightgray} C4 & \begin{tabular}{c|c}
-                0.94  & 0.90 \\
-             \end{tabular} & \begin{tabular}{c|c}
-                0.92  & 0.90 \\
-             \end{tabular}  & \begin{tabular}{c|c}
-                0.93  & 0.91 \\
+            Indirect link & \begin{tabular}{c|c}
+                98  & 97 \\
+             \end{tabular}\\
+            \rowcolor{lightgray} 
+            Isolated & \begin{tabular}{c|c}
+                93  & 91 \\
              \end{tabular}\\
             Overall & \begin{tabular}{c|c}
-                0.94  & 0.91 \\
-             \end{tabular} & \begin{tabular}{c|c}
-                0.94  & 0.90 \\
-             \end{tabular}  & \begin{tabular}{c|c}
-                0.93  & 0.90 \\
+                93  & 90 \\
              \end{tabular}\\
         \end{tabular}
-        \caption{Comparison of all performance measure between Our DE\_SVM and Fu\textquotesingle s DE\_SVM }
+        \caption{Comparison of all performance measure between Our DE\_SVM and Fu et al.\textquotesingle s DE\_SVM }
         \label{tab:performance Measure comp}
     \end{table}
+\section{Results}
+\label{sect:Result}
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/delta_chart_our_SVM_DE_vs_FU's_SVM_DE.png}
-        \caption{Score Delta between our DE\_SVM with Fu\textquotesingle s DE\_SVM. Positive values indicate when our SVM performs better than Fu\textquotesingle s.}
-        \label{fig:delta_comp_Fu's_ours}
-    \end{figure}
+    \textbf{RQ1}:  {\em Can we reproduce Fu et al.\textquotesingle s results for tuning SVM with differential evolution (DE)?}
     
-    \textbf{RQ2}: {\em  How do the local models compare with global models in both tuned and untuned versions in terms model training time?}
+  
+    This study uses same differential evolution with SVM for both global and local models. Thus to compare with Fu's DE with SVM as global model, the first task as part of this experiment was to recreate Fu et al.\textquotesingle s work so that this study have a baseline to measure against.
+  Hence, this research question is a  ``sanity check'' that must be passed before moving on to the other, more interesting research questions.
     
-    For this part of the experiment, we evaluated the method. As discussed above, this study have used Gap statistic~\cite{mohajer2011comparison}~\cite{tibshirani2001estimating} for finding the best number of clusters, using minimum and maximum number of clusters as 3 and 15, respectively. As part of the experiment 13 clusters are getting best results as per the Gap statistics for the training dataset. 
     
-    Now for the next part of the experiment a classifier need to be created on each of the clusters. For this SVM, KNN and both of the algorithms with DE-tuned parameter has been used and implemented. For the normal SVM and KNN the experiment uses the default parameters, described in Table 2. For performing the DE on the learners, the parameters defined in Table 2. 
     
-    This study measures the time taken for this model to train which includes time taken by GAP statistic, K-Means training time, and SVM/KNN with DE training time.
+    The study uses the same SVM from Scikit-learn with the parameters tuned as mentioned in Table~\ref{tab:DE_Parameters}. Here the training time of the DE+SVM model is also compared with Fu et al.\textquotesingle s model. Table~\ref{tab:performance Measure comp}   shows the class by class comparison for all the performance measure this study is using.
     
-    We are comparing the results with Fu\textquotesingle s SVM, and XU\textquotesingle s CNN with our models. From the Figure~\ref{fig:time} it can be seen when we cluster data and then create local models on each cluster the study shows good performance improvement. In the case of K-Means then DE with SVM 14 times improvement from using SVM with DE cna be observed. And almost 965x improvement in training time from XU\textquotesingle s CNN. With K-Means then DE with KNN, around 11 times performance improvement can be seen and from XU\textquotesingle s CNN the improvement is around 700 times. Seeing these results we can answer our 2nd question that local models do in fact reduce the runtime by many folds.
+    From Table~\ref{tab:performance Measure comp}  it can be seen that our results  with SVM with DE for hyperparameter tuning ~\cite{duan2003evaluation}~\cite{fu2017easy} similar to the results of Fu et al. It can be observed from this figure that for most of the cases apart from class 3, the model has performed a little better, but the delta between the performance is very small. 
     
-    \begin{figure}
+    Hence the answer to our  RQ1, is that this study has successfully implemented Fu et al.\textquotesingle s SVM. Hence, we can move to more interesting questions.
+    
+    
+    
+    \begin{figure}[!t]
         \centering
         \includegraphics[width=\linewidth]{fig/Time.png}
-        \caption{Training time comparison between models (except XU's CNN runtime of 50,400 sec)}
+        \caption{Training time comparison between models in Log Scale. In the above,
+        the Xu et al. 2016 results are labelled ``CNN'' and the Fu et al. 2017
+        results are labelled ``DE\_SVM''.}
         \label{fig:time}
     \end{figure}
     
+    % \begin{figure}[!b]
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/delta_chart_our_SVM_DE_vs_FU's_SVM_DE.png}
+    %     \caption{Score Delta between our KMeans\_DE\_SVM with Fu et al.\textquotesingle s DE\_SVM. Positive values indicate when our SVM performs better than Fu et al.\textquotesingle s.}
+    %     \label{fig:delta_comp_Fu's_ours}
+    % \end{figure}
+    
+ 
+   \textbf{RQ2}: {\em  How do the local models compare with global models in both tuned and untuned versions in terms model training time?}
+    
+   
+    
+    For RQ2, this experiment built one model for each clusters using either normal or tuned versions of 
+     SVM or  KNN (where tuning was performed with DE):
+      For the default SVM and KNN the experiment uses the default parameters, described in Table~\ref{tab:learners}. 
+  
+     As discussed above, this study have used the GAP statistic~\cite{mohajer2011comparison}~\cite{tibshirani2001estimating} for finding the best number of clusters, using minimum and maximum number of clusters as 3 and 15, respectively. As part of the experiment we learned that 13 clusters achieves  best results 
+     (measured as per the GAP statistic).
+     
+    This study measures the time taken for this model to train which includes time taken by GAP statistic, KMeans training time, and SVM/KNN with DE training time.
+    
+   
+    Figure~\ref{fig:time} compare the model training time in log scale  of all models with the results
+    from XU et al.\textquotesingle s CNN approach.
+    Its apparent from the figure~\ref{fig:time} that for this domain KNN and SVM has the fastest runtimes. That said, as describe below, we cannot   recommend these
+    methods since, as shown below, they achieve poor F1 Scores.
+    
+    The figure also shows, when we cluster data and then create local models on each cluster it achieves fast 
+    training times.  For example,
+    in the case of KMeans\_DE\_SVM, we achieve an eight-fold  speed improvement from using DE\_SVM. 
+    Further, we see a speed improvement of over 570 faster training time from XU\textquotesingle s CNN\footnote{
+    Technical aside: most of  our times  come from a   single core, single thread implementation.
+    That said,  just for completeness, we have trained our   $k$ clusters over a standard 8 core laptop. In that multi-threaded implementation,  our training times
+    are 965 times faster than  XU\textquotesingle s CNN.  }.
+     
+    %  In the algorithm in figure~\ref{fig:pseudo_KMeans} that creates the local clusters and create the models on them can also train the local models in parallel, in that case the model training time become the training time of a local model that takes the largest time to train along with the time taken by the Gap statistics and clustering method. In this scenario the study sees around 14 time improvement for KMeans\_DE\_SVM from DE\_SVM model and around 965 time improvement from Xu's CNN and KMeans\_DE\_KNN performance improves to almost 790 times.
+     
+      
+    
+    
+    
+    
     \textbf{RQ3}: {\em  How does the performance of local models compare with global models and state-of-the-art Deep Learner when used with SVM and KNN?} 
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/precision.png}
-        \caption{Precision score for all learners}
-        \label{fig:precison}
-    \end{figure}
+    % \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/precision.png}
+    %     \caption{Precision score for all learners}
+    %     \label{fig:precison}
+    % \end{figure}
     
-    The final part of our research question was to check if the local models performance is comparable to Fu's DE\_SVM and the XU's state of the art CNN. To evaluate the performance of the models this study compares performance measures described in Section~\ref{sssec:performance_criteria}. As mentioned in the section, a 10 fold - 10 repeat cross validation has been performed, so all the results are average of 100 models created. 
+       
+    %  \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/recall.png}
+    %     \caption{Recall score for all learners}
+    %     \label{fig:Recall}
+    % \end{figure}
     
-    The 1st performance measure is precision is in Figure~\ref{fig:precison}. The precision of 9 learners discussed in Table~\ref{tab:learners}, for overall class performance is shown in the figure. Now By evaluating the table it can be seen that DE\_SVM's precsion is at 0.94 followed by KMeans\_DE\_SVM at 0.92. Similarly DE\_KNN is followed by KMeans\_DE\_KNN. Both the local models performance almost similar to the global models. But both the models out-performs XU's CNN. Similar trend is also noticeable between without DE versions of the algorithms with default parameters.
-    
-     \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/recall.png}
-        \caption{Recall score for all learners}
-        \label{fig:Recall}
-    \end{figure}
-    
-    In Figure~\ref{fig:Recall} the performance measures of all the models can be seen in similar way for recall. In here as well the results are similar as precision, global and local models with parameter tuning performs almost similar, but out-performs CNN.
-    
+     
     \begin{figure}
         \centering
         \includegraphics[width=\linewidth]{fig/f-score.png}
-        \caption{F1-Score comparison for all learners}
+        \caption{F1 Score comparison for all learners. Numbers above each bar are ranks learned from the Scott-Knot statistical test. Clusters have different ranks if they are determined to be different
+        by both a significance test (bootstrapping) and an effect size test (Cliffs' Delta). For example, the first two bars have the same rank while the third bar has a different rank. In the above,
+        the Xu et al. 2016 results are labelled ``CNN'' and the Fu et al. 2017
+        results are labelled ``DE\_SVM''.}
         \label{fig:F1-Score}
     \end{figure}
     
-    Figure~\ref{fig:F1-Score} for F-Score measure which is a better understanding of the trade off between precision and recall. Here as well similar results can be observed.
+    The final part of our research question was to check if the local models performance is comparable to Fu et al.'s DE\_SVM and the XU's state of the art CNN. To evaluate the performance of the models this study compares F1 performance measures described in Section~\ref{sssec:performance_criteria}. As mentioned in the section, a 10 fold * 10 repeat cross validation was  performed, so all the results are mean of 100 models created. 
     
-    Seeing these results it is assumable that from overall performance evaluation local models performance is almost similar to it's global version. But this study also makes delta comparison between class performance of all the performance criteria for local vs global models for SVM and KNN, and also XU's CNN vs local models. Figure~\ref{fig:Global_vs_Local_DE_SVM} shows the class wise score delta between local KMeans\_DE\_SVM vs global DE\_SVM. We see from the Figure~\ref{fig:Global_vs_Local_DE_SVM} that for all performance criteria and all the classes, the global model performs a slightly better, but the delta is very low.
-    
-    Figure~\ref{fig:CNN_vs_KMeans_DE_SVM} shows the score delta between XU's CNN and local KMeans\_DE\_SVM. We see in the result that except class 2 recall our models performs better and the delta score is high in class 3 and 4.
+    Figure~\ref{fig:F1-Score} shows our  F1 Score results (mean result across
+    all 4 class of Table~\ref{tab:performance Measure comp}). The numbers on top of each bar show the results of statistical tests. Bars with the same rank are statistically indistinguishable.
+       Note that these results should be discussed with respect to the runtime results shown above:
+       
+       \bi
+       
+        \item
+      In  Figure~\ref{fig:time}, we saw that  CNN was our  slowest learning method.
+       We would excuse this slowness and endorse its use if the performance scores for this extremely slow method  was outstandingly high. This is {\em not} the case: as seen
+       Figure~\ref{fig:F1-Score}, 
+        CNN is beaten by many of the treatments shown here.
+       \item
+       In  Figure~\ref{fig:time},  DE\_SVM was our second slowest method. Again, we would endorse this approach if nothing else comes close to it in terms of performance.
+       While KMeans\_DE\_SVM is significantly different (as shown by our Scott-Knott results), the median performance delta is very small indeed
+       (median F1 Score scores of 94 vs 92). This is an important pragmatic
+       consideration since, as shown in Figure~\ref{fig:time}, the learning time of 
+       KMeans\_DE\_SVM  was  743/88 = 840\% faster than that of  DE\_SVM
+       \ei
+       
+      \noindent In summary, we recommend one of our  local learning method (KMeans\_DE\_SVM) since:
+       \bi
+       \item It is 840\%   faster than the prior state-of-the-art results (Fu et al.'s 2017 DE\_SVM method);
+       \item
+       On a single core machine, it is 570 times faster
+       than the prior state-of-the-art before that (Xu et al.'s 2016 CNN method);
+       \item
+       On a standard laptop with  8 cores, KMeans\_DE\_SVM  runs 965 times faster than Xu et al.'s CNN method;
+       \item
+       Our local learner performs better than Xu et al. and only a tiny fraction worse than Fu et al.   Given these small performance deltas,
+            from a pragmatic engineering perspective,
+              we find it hard to justify the extra computational cost of
+               DE\_SVM over  KMeans\_DE\_SVM. 
+       \ei
+      
+       
+      
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/de_vs_KMenas.png}
-        \caption{Class wise Score Delta between Global DE\_SVM vs Local KMeans\_DE\_SVM}
-        \label{fig:Global_vs_Local_DE_SVM}
-    \end{figure}
+    % \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/de_vs_KMenas.png}
+    %     \caption{Class wise Score Delta between Global DE\_SVM vs Local KMeans\_DE\_SVM}
+    %     \label{fig:Global_vs_Local_DE_SVM}
+    % \end{figure}
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/cnn_vs_Kmeans.png}
-        \caption{Class wise score delta between XU's CNN and Local KMeans\_DE\_SVM}
-        \label{fig:CNN_vs_KMeans_DE_SVM}
-    \end{figure}
+    % \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/cnn_vs_Kmeans.png}
+    %     \caption{Class wise score delta between XU's CNN and Local KMeans\_DE\_SVM}
+    %     \label{fig:CNN_vs_KMeans_DE_SVM}
+    % \end{figure}
     
-    Next in Figure~\ref{fig:Global_vs_Local_DE_KNN} class wise score delta of performance matrices between local KMeans\_DE\_KNN vs global DE\_KNN has been recorded, and s similar result vsn be seen, as of the global and local SVM version. in most of the cases the global model's performance is slightly better than local model. In case of XU's CNN vs local KMeans\_DE\_KNN model we see that for class 3 the performance increase is very noticeable for rest of the classes and performance measure the results are almost similar, which can be noticed in Figure~\ref{fig:CNN_vs_KMeans_DE_KNN}.
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/KNN_vs_KMeans.png}
-        \caption{Class wise score delta between Global DE\_KNN vs Local KMeans\_DE\_KNN}
-        \label{fig:Global_vs_Local_DE_KNN}
-    \end{figure}
+    % \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/KNN_vs_KMeans.png}
+    %     \caption{Class wise score delta between Global DE\_KNN vs Local KMeans\_DE\_KNN}
+    %     \label{fig:Global_vs_Local_DE_KNN}
+    % \end{figure}
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{fig/cnn_vs_Kmeans_Knn.png}
-        \caption{Class wise score delta between XU's CNN and Local KMeans\_DE\_KNN}
-        \label{fig:CNN_vs_KMeans_DE_KNN}
-    \end{figure}
+    % \begin{figure}
+    %     \centering
+    %     \includegraphics[width=\linewidth]{fig/cnn_vs_Kmeans_Knn.png}
+    %     \caption{Class wise score delta between XU's CNN and Local KMeans\_DE\_KNN}
+    %     \label{fig:CNN_vs_KMeans_DE_KNN}
+    % \end{figure}
     
-    Seeing all the results it can be observed that there is a little difference between the global vs local models as well a difference between state of the art CNN and local models. But observing the score delta charts we see the difference is very small most of the time. This study analysis if these performance measure difference is statistically significant or not. So we ranked the models using scott-knott test as mentioned in Section~\ref{sssec:Statistical Analysis}. The test was conducted on all the performance measures separately with all the results from 10 fold - 10 repeat validations.
+    % Seeing all the results it can be observed that there is a little difference between the global vs local models as well a difference between state of the art CNN and local models. But observing the score delta charts we see the difference is very small most of the time. This study analysis if these performance measure difference is statistically significant or not. This study ranks the models using Scott-Knott test as mentioned in Section~\ref{sssec:Statistical Analysis}. The test was conducted on all the performance measures separately with all the results from 10 fold * 10 repeat validations.
     
-    \begin{table}[h!]
-        \centering
-        {\small   \begin{tabular}{l@{~~~~}l@{~~~~}r@{~~~~}r@{~~}c@{}r}
-        \multicolumn{1}{l}{\textbf{Rank}}& \textbf{Model} & \textbf{med.} & \textbf{IQR} & \\ 
-         \rowcolor{lightgray}\arrayrulecolor{lightgray}
-        \textbf{Precision} & \textbf{} & \textbf{} & \textbf{} & \\\hline
-          1 &        KMeans\_SVM &    58  &  2 & \quart{57}{1}{60}{2} \\ \hline
-          2 &         SVM &    66  &  0  & \quart{66}{0}{66}{0} \\ \hline
-          3 &        KMeans\_KNN  &    78  &  0  & \quart{78}{0}{78}{0} \\ \hline
-          4 &       KNN &    81   &  0 & \quart{81}{0}{81}{0} \\ \hline
-          5 &        CNN &    85  &  0 & \quart{85}{0}{85}{0} \\   
-          5 &         KMeans\_DE\_KNN &    87   &  3 & \quart{84}{2}{88}{2} \\\hline
-          6 &        KMeans\_DE\_SVM &    92 &  2 & \quart{91}{0}{93}{2} \\
-          6 &        DE\_KNN &    93  &  1 & \quart{83}{10}{93}{0} \\\hline
-          7 &       DE\_SVM &    94  &  1  & \quart{91}{2}{94}{1} \\\hline 
     
-        \end{tabular}} 
-    \caption{Scott-Knott ranking for Precision}
-    \label{tab: Scott-Knott ranking for Precision}
-    \end{table}
+    % \begin{table}[h!]
+    %     \centering
+    %     {\small   \begin{tabular}{l@{~~~~}lr@{~~~~}rl}
+    %     \rowcolor{darkgray} \multicolumn{2}{l}{\textcolor{white}{\textbf{F1-Score}}}  & & & \\
+    %     \multicolumn{1}{l}{\cellcolor{darkgray}\textcolor{white}{\textbf{Rank}}} & {\cellcolor{darkgray} \textcolor{white} {\textbf{Model}}} & \cellcolor{darkgray}\textcolor{white}{\textbf{med.}} & \cellcolor{darkgray}\textcolor{white}{\textbf{IQR}} & \cellcolor{darkgray}\\ \hline
+    %       1 &        KMeans\_SVM &    60  &  1 & \quart{59}{0}{61}{5} \\ \hline
+    %       2 &        SVM &    65  &  1  & \quart{65}{0}{66}{1} \\ \hline
+    %       3 &        KMeans\_KNN  &    79  &  1  & \quart{78}{1}{79}{0} \\ 
+    %       3 &       KNN &    80   &  0 & \quart{79}{1}{80}{0} \\ \hline
+    %       4 &        CNN &    84  &  0 & \quart{84}{0}{84}{0} \\   
+    %       4 &         KMeans\_DE\_KNN &    87   &  3 & \quart{84}{1}{88}{3} \\\hline
+    %       5 &        KMeans\_DE\_SVM &    92 &  2 & \quart{91}{0}{93}{2} \\\hline
+    %       6 &        DE\_KNN &    93  &  0 & \quart{83}{10}{93}{0} \\
+    %       6 &       DE\_SVM &    94  &  1  & \quart{91}{2}{94}{1} \\\hline 
     
-    \begin{table}[h!]
-        \centering
-        {\small   \begin{tabular}{l@{~~~~}l@{~~~~}r@{~~~~}r@{~~}c@{}r}
-        \multicolumn{1}{l}{\textbf{Rank}}& \textbf{Model} & \textbf{med.} & \textbf{IQR} & \\ 
-         \rowcolor{lightgray}\arrayrulecolor{lightgray}
-        \textbf{Recall} & \textbf{} & \textbf{} & \textbf{} & \\\hline
-          1 &        KMeans\_SVM &    59  &  2 & \quart{58}{1}{60}{2} \\ \hline
-          2 &         SVM &    66  &  0  & \quart{66}{0}{67}{1} \\
-          3 &        KMeans\_KNN  &    79  &  1  & \quart{79}{0}{80}{1} \\ \hline
-          3 &       KNN &    80   &  0 & \quart{80}{0}{80}{0} \\ \hline
-          4 &        CNN &    84  &  0 & \quart{84}{0}{84}{0} \\   
-          4 &         KMeans\_DE\_KNN &    87   &  3 & \quart{84}{1}{88}{3} \\\hline
-          5 &        KMeans\_DE\_SVM &    92 &  2 & \quart{91}{0}{93}{2} \\
-          5 &        DE\_KNN &    93  &  1 & \quart{83}{10}{93}{0} \\
-          5 &       DE\_SVM &    94  &  1  & \quart{92}{1}{94}{1} \\\hline 
-    
-        \end{tabular}} 
-    \caption{Scott-Knott ranking for Recall}
-    \label{tab: Scott-Knott ranking for Recall}
-    \end{table}
-    
-    \begin{table}[h!]
-        \centering
-        {\small   \begin{tabular}{l@{~~~~}l@{~~~~}r@{~~~~}r@{~~}c@{}r}
-        \multicolumn{1}{l}{\textbf{Rank}}& \textbf{Model} & \textbf{med.} & \textbf{IQR} & \\ 
-        \rowcolor{lightgray}\arrayrulecolor{lightgray}
-        \textbf{F-Score} & \textbf{} & \textbf{} & \textbf{} & \\\hline
-          1 &        KMeans\_SVM &    60  &  1 & \quart{59}{0}{61}{2} \\ \hline
-          2 &         SVM &    65  &  1  & \quart{65}{0}{66}{1} \\
-          3 &        KMeans\_KNN  &    79  &  1  & \quart{78}{1}{79}{0} \\ \hline
-          3 &       KNN &    80   &  0 & \quart{79}{1}{80}{0} \\ \hline
-          4 &        CNN &    84  &  0 & \quart{84}{0}{84}{0} \\   
-          4 &         KMeans\_DE\_KNN &    87   &  3 & \quart{84}{1}{88}{3} \\\hline
-          5 &        KMeans\_DE\_SVM &    92 &  2 & \quart{91}{0}{93}{2} \\\hline
-          6 &        DE\_KNN &    93  &  0 & \quart{83}{10}{93}{0} \\
-          6 &       DE\_SVM &    94  &  1  & \quart{91}{2}{94}{1} \\\hline 
-    
-        \end{tabular}} 
-    \caption{Scott-Knott ranking for F-Score}
-    \label{tab: Scott-Knott ranking for F-Score}
-    \end{table}
+    %     \end{tabular}} 
+    % \caption{Scott-Knott ranking for F1-Score}
+    % \label{tab: Scott-Knott ranking for F1-Score}
+    % \end{table}
     
 
-    From the results of the Scott-Knott test it can be seen that in case of precision in Table~\ref{tab: Scott-Knott ranking for Precision} the DE\_SVM and KMeans\_DE\_SVM have separate ranking as 6 for  KMeans\_DE\_SVM and 7 for DE\_SVM and as well XU's CNN is at rank 5. So in case of precision it can be observed that the results of these 3 models are statistically different, but looking at the median it can be said that, although they are different they have very similar or we can say comparable results. It can be seen in Table~\ref{tab: Scott-Knott ranking for Recall} DE\_SVM and KMeans\_DE\_SVM are ranked similar, so in case of recall their performance is statistically same, both ranked at 5, while XU's CNN is ranked at 4. And the results are similar in case of F-Score as seen in Table~\ref{tab: Scott-Knott ranking for F-Score}, with DE\_SVM ranked at 6 and KMeans\_DE\_SVM ranked at 5 and XU's CNN ranked at 4.
+    % From the results of the Scott-Knott test it can be seen that in case of precision in Table~\ref{tab: Scott-Knott ranking for F1-Score} the DE\_SVM and KMeans\_DE\_SVM have separate ranking as 5 for  KMeans\_DE\_SVM and 6 for DE\_SVM and as well XU's CNN is at rank 4. So in case of F1-Score it can be observed that the results of these 3 models are statistically different, but looking at the median it can be said that, although they are different they have very similar or comparable results.
     
-    So seeing all the results of difference perfromance measures and ranking test that although local models have a slightly lower measure than global models in case of precision and f-score and a slightly better performance in recall, overall the local models performs almost similar to their global part and the models performance is comparable to state of the art convolution neural networks.
+    % Seeing all these results of difference performance measures and ranking test, it can be concluded that although local models have a slightly lower performance measure than global models, overall we can say the local models performs almost similar to their global part and the models performance is comparable to state of the art convolution neural networks.
     
     
 \section{THREATS TO VALIDITY}
 \label{sect:THREATS TO VALIDITY}
-    Threats to internal validity of our work includes the fact that this study started the experiment directly based on the code repository that was provided in the "Easy Over Hard" paper. Since we forked Fu's GitHub Repo link and collected the metrics for DE\_SVM that the result's validity are directly linked to the validity of his results. In order to continue with the other learners described in Table~\ref{tab:learners}, we added additional code and scripts to the code base . 
-    
-    Most of the Deep Learning methods or tools from papers in SE are not publicly available or they are too complicated to implement, the XU's CNN is also not publicly available. Along with that CNNs normally have multiple layers and thousands or weights and connections between layers, a very small deviation from original network can results in huge difference in performance. So this paper does not implement XU's CNN network, all of XU's result data is publicly available along with the hardware configuration(2.5GHz,16GB ram on 64bit platform), this experiment uses almost similar hardware configuration with 3.00GHz processor with 16GB ram, running on 64bit platform and this paper implemented FU's DE\_SVM in our machine configuration and got runtime that is quite similar. So it can assumed that this experiment's runtimes will be comparable with FU's and XU's models.
-    
-    Also In the "Easy Over Hard" paper, Fu also points out that since the original Word Embedding + SVM baseline method was not available publicly, he implemented his own version and got results very similar to the ones reported on Xu's study. As this study directly uses the Word Embedding model created by Fu, the results validity depends on Fu's implementation of the Word Embedding model.
-    
-    In this paper, the performance metrics that  are reported for the experiments - recall, precision, f1-score, and accuracy - are the same ones reported on Fu's DE\_SVM paper and the XU's CNN  paper. The experimental results for the learner combination in Table A are very much comparable to the DE\_SVM results. The reason this study tries building local models using cluster-first approach was to capture any local similarities or properties that the data domain might have. It worked out well in this experimen, but that does not mean that other external text mining datasets will have any local patterns that can be captured. It might be the case there are not any locally specific characteristics and hence global models with tuned standard learners might produce similar results as local models. But it is very much possible that there might be local nuances in the dataset that can be well captured by the clusters and hence the models trained on the subsets might be better at prediction.
+    As with any empirical study, biases can affect the final results. Therefore, any conclusions made from this work must be considered with the following issues in mind:
+    \bi
+        \item Sampling bias: threatens any classification experiment; i.e., what matters there may not be true here. For example, the data sets used here is a Stack Overflow dataset and were supplied by one individual. Although this study uses multiple word2vec models to validate with a 10-fold * 10 repeat validations. The text data is of similar format of question pairs.
+        
+        \item Learner bias: For building the model for finding semantic relatedness of question pars in this study, we elected to use Support Vector Machine and K-Nearest Neighbor for classification and KMeans for clustering. This study chose these methods because its results were comparable to the more complicated algorithms and has been successful in text classification field. Classification and clustering is a large and active field and any single study can only use a small subset of the known algorithms. 
+        
+        \item Evaluation bias: This paper uses precision, recall and F1 Score as performance measures. Other methods like Concordant - Discordant ratio~\cite{goodman1972measures}, Gini Coefficient~\cite{neslin2006defection}, Kolmogorov Smirnov chart~\cite{guo2011case} that are used for this purpose can also be used for performance evolution in future studies.
+
+        \item Input bias: For the localization algorithm, this study randomly selects input values for a range to determine the number of clusters, also for hyperparameter tuning using DE, a subset of parameters has been selected for tuning and their range is either the whole range that the parameter accepts or a range that is selected for the study.
+    \ei    
 
 
 \section{CONCLUSION}
 \label{sect:CONCLUSION}
-    In this paper we try to investigate significance of local models from the perspective of significant reduction in training time with comparable performance then global models and Deep Learning system for predicting knowledge unit's relatedness on Stack Overflow. This study shows procedure to cluster the data first and then build local models on each cluster separately, then use the clustering algorithms with the local classification algorithm together to predict. Algorithm's run time depends upon the size of the input, each local model reduces the training time by having to run on a subset of data and thus reducing the overall run time. This experimental result shows -
+   This paper investigates the value of local learning from the perspective of  reducing the   training time compared to 
+    methods for  predicting knowledge unit's relatedness on Stack Overflow. This study   clustered the data first;  then build local models on each cluster separately; then use the clustering algorithms with the local classification algorithm together to predict. As shown above:
     
-    \begin{itemize}
+    \bi
         \item Clustering the data first and then building local models on those subsets of data shows significant reduction in runtime.
-        \item Using KMeans on the Word Embedding model first to cluster the data into smaller subsets and then running SVM and KNN with their DE versions showed runtime reduction as large as 965 times for KMeans\_DE\_SVM version with CNN and almost 14 times improvement than its global DE\_SVM version.
+        \item Using KMeans on the Word Embedding model first to cluster the data into smaller subsets and then running SVM and KNN with their DE versions showed runtime reduction as large as 570 times for KMeans\_DE\_SVM version with CNN and almost 8 times improvement than its global DE\_SVM version with sequential run. And with parallel run the performance improvement for KMeans\_DE\_SVM version with CNN is 965x and almost 14 times with its global counter part.
         \item The performance in term of precision, recall and F-score is almost similar to its global counter part and sometime better then the XU's CNN model.
-    \end{itemize}
+    \ei
     
-    With this paper we also like to propagate the importance of "No Free Lunch Theorem" ~\cite{wolpert1997no} in machine learning. This experiment discovered each local learner with DE is fine tuned with separate set of parameter values. That proves the clustered data are different from one another and thus building local models creates more specificity in prediction. 
+    % With this paper we also like to propagate the importance of "No Free Lunch Theorem" ~\cite{wolpert1997no} in machine learning. This experiment discovered each local learner with DE is fine tuned with separate set of parameter values. That proves the clustered data are different from one another and thus building local models creates more specificity in prediction. 
     
     
     For future work, we suggest trying several variations of this experiment - 
     
     \begin{itemize}
-        \item In this experiment we tune the local models separately, tuning all the local models along with the clustering algorithm together might produce some interesting results.
+        \item This study tunes the local models separately, tuning all the local models along with the clustering algorithm together might produce some interesting results.
         \item Trying to find correlation between number of cluster and training time and performance might give us effect of number of clusters on the prediction model.
     \end{itemize}
-    
+
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{700faster} 
